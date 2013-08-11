@@ -15,10 +15,14 @@
  */
 package com.abahgat.suffixtree;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -81,13 +85,13 @@ public class GSuffixTree
      * The last leaf that was added during the update operation
      */
     private int activeLeaf = 0;
-    
+
     public GSuffixTree()
     {
         root = createNode();
         activeLeaf = root;
     }
-    
+
     @SuppressWarnings("unchecked")
     public GSuffixTree(String path)
     {
@@ -95,37 +99,95 @@ public class GSuffixTree
         {
             System.out.print("Loading...");
             long t1 = System.currentTimeMillis();
-            ObjectInputStream nodesInput = new ObjectInputStream(new FileInputStream(path+".ns"));
+            ObjectInputStream nodesInput = new ObjectInputStream(new FileInputStream(path + ".nodes"));
             nodes = (ArrayList<Node>) nodesInput.readObject();
             nodesInput.close();
-            
-            ObjectInputStream edgesInput = new ObjectInputStream(new FileInputStream(path+".es"));
+
+            ObjectInputStream edgesInput = new ObjectInputStream(new FileInputStream(path + ".edges"));
             edges = (ArrayList<Edge>) edgesInput.readObject();
             edgesInput.close();
             long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) +"ms");
+            System.out.println("Done : " + (t2 - t1) + "ms");
         }
         catch (Exception ex)
         {
             ex.printStackTrace();
         }
     }
-    
+
+    public GSuffixTree(String path, boolean inJson)
+    {
+        try
+        {
+            System.out.print("Loading...");
+            long t1 = System.currentTimeMillis();
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.json"), "utf-8"));
+            String line = null;
+            while ((line = nReader.readLine()) != null)
+            {
+                nodes.add(Utils.toNode(line));
+            }
+            nReader.close();
+
+            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.json"), "utf-8"));
+            line = null;
+            while ((line = eReader.readLine()) != null)
+            {
+                edges.add(Utils.toEdge(line));
+            }
+            eReader.close();
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + (t2 - t1) + "ms");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     public void toFile(String path)
     {
         try
         {
             long t1 = System.currentTimeMillis();
             System.out.print("Writing...");
-            ObjectOutputStream edgesOut = new ObjectOutputStream(new FileOutputStream(path+".es"));
+            ObjectOutputStream edgesOut = new ObjectOutputStream(new FileOutputStream(path + ".edges"));
             edgesOut.writeObject(edges);
             edgesOut.close();
-            
-            ObjectOutputStream nodesOut = new ObjectOutputStream(new FileOutputStream(path+".ns"));
+
+            ObjectOutputStream nodesOut = new ObjectOutputStream(new FileOutputStream(path + ".nodes"));
             nodesOut.writeObject(nodes);
             nodesOut.close();
             long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) +"ms");
+            System.out.println("Done : " + (t2 - t1) + "ms");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void toJSONFile(String path)
+    {
+        try
+        {
+            long t1 = System.currentTimeMillis();
+            System.out.print("Writing...");
+            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.json"), "utf-8"));
+            for(Edge edge : edges)
+            {
+                eWriter.append(Utils.toJSONString(edge)).append("\n");
+            }
+            eWriter.close();
+
+            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.json"), "utf-8"));
+            for(Node node : nodes)
+            {
+                nWriter.append(Utils.toJSONString(node)).append("\n");
+            }
+            nWriter.close();
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + (t2 - t1) + "ms");
         }
         catch (Exception ex)
         {
@@ -305,8 +367,7 @@ public class GSuffixTree
      *         inputs
      * 
      */
-    private Pair<Boolean, Integer> testAndSplit(final int s2, final String stringPart, final char t, final String remainder,
-            final int value)
+    private Pair<Boolean, Integer> testAndSplit(final int s2, final String stringPart, final char t, final String remainder, final int value)
     {
         // descend the tree as far as possible
         Pair<Integer, String> ret = canonize(s2, stringPart);
@@ -527,7 +588,7 @@ public class GSuffixTree
         nodes.add(new Node());
         return nodes.size() - 1;
     }
-    
+
     private static int createNode(int ref)
     {
         Node n = new Node();
@@ -535,24 +596,22 @@ public class GSuffixTree
         nodes.add(n);
         return nodes.size() - 1;
     }
-    
+
     public static int createEdge(String rest, int leaf)
     {
-        edges.add(new Edge(rest,leaf));
-        return edges.size()-1;
+        edges.add(new Edge(rest, leaf));
+        return edges.size() - 1;
     }
-    
-    
+
     public static Node node(int index)
     {
         return nodes.get(index);
     }
-    
+
     public static Edge edge(int index)
     {
         return edges.get(index);
     }
-    
 
     Node getRoot()
     {

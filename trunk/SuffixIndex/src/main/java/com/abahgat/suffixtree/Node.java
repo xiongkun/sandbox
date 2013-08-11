@@ -44,24 +44,26 @@ class Node implements Serializable
      * Originally it was a List<Integer> but it took too much memory, changing it to int[] take less memory because
      * indexes are stored using native types.
      */
-    private int[] data;
+//    private int[] data;
+    
+    private HashSet<Integer> data;
 
-    /**
-     * Represents index of the last position used in the data int[] array.
-     * 
-     * It should always be less than data.length
-     */
-    private int lastIdx = 0;
-
-    /**
-     * The starting size of the int[] array containing the payload
-     */
-    private static final int START_SIZE = 0;
-
-    /**
-     * The increment in size used when the payload array is full
-     */
-    private static final int INCREMENT = 1;
+//    /**
+//     * Represents index of the last position used in the data int[] array.
+//     * 
+//     * It should always be less than data.length
+//     */
+//    private int lastIdx = 0;
+//
+//    /**
+//     * The starting size of the int[] array containing the payload
+//     */
+//    private static final int START_SIZE = 0;
+//
+//    /**
+//     * The increment in size used when the payload array is full
+//     */
+//    private static final int INCREMENT = 1;
 
     /**
      * The set of edges starting from this node
@@ -94,7 +96,8 @@ class Node implements Serializable
         // edges = new EdgeBag();
         edges = new HashMap<Character, Integer>();
         suffix = -1;
-        data = new int[START_SIZE];
+//        data = new int[START_SIZE];
+        data = new HashSet<Integer>();
     }
 
     /**
@@ -183,22 +186,23 @@ class Node implements Serializable
      */
     private boolean contains(int index)
     {
-        int low = 0;
-        int high = lastIdx - 1;
-
-        while (low <= high)
-        {
-            int mid = (low + high) >>> 1;
-            int midVal = data[mid];
-
-            if (midVal < index)
-                low = mid + 1;
-            else if (midVal > index)
-                high = mid - 1;
-            else
-                return true;
-        }
-        return false;
+        return data.contains(index);
+//        int low = 0;
+//        int high = lastIdx - 1;
+//
+//        while (low <= high)
+//        {
+//            int mid = (low + high) >>> 1;
+//            int midVal = data[mid];
+//
+//            if (midVal < index)
+//                low = mid + 1;
+//            else if (midVal > index)
+//                high = mid - 1;
+//            else
+//                return true;
+//        }
+//        return false;
         // Java 5 equivalent to
         // return java.util.Arrays.binarySearch(data, 0, lastIdx, index) >= 0;
     }
@@ -290,12 +294,13 @@ class Node implements Serializable
 
     private void addidx(int index)
     {
-        if (lastIdx == data.length)
-        {
-            int[] copy = new int[data.length + INCREMENT];
-            System.arraycopy(data, 0, copy, 0, data.length);
-            data = copy;
-        }
-        data[lastIdx++] = index;
+//        if (lastIdx == data.length)
+//        {
+//            int[] copy = new int[data.length + INCREMENT];
+//            System.arraycopy(data, 0, copy, 0, data.length);
+//            data = copy;
+//        }
+//        data[lastIdx++] = index;
+        data.add(index);
     }
 }

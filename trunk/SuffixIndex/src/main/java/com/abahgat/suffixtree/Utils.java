@@ -152,7 +152,12 @@ public class Utils
         tree.toFile("data/poi");
 
         GSuffixTree tree2 = new GSuffixTree("data/poi");
-        System.out.println(tree2.search("岗"));
+        
+        System.out.println(GSuffixTree.nodes.size());
+        
+        System.out.println(GSuffixTree.edges.size());
+        
+//        System.out.println(tree2.search("岗"));
 
     }
 }

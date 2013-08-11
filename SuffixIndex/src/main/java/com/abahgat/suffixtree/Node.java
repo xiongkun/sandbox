@@ -149,7 +149,7 @@ class Node implements Serializable
         }
         return ret;
     }
-
+    
     /**
      * Adds the given <tt>index</tt> to the set of indexes associated with <tt>this</tt>
      */
@@ -160,7 +160,7 @@ class Node implements Serializable
             return;
         }
 
-        addidx(index);
+        addIdx(index);
 
         // add this reference to all the suffixes as well
         int iter = this.suffix;
@@ -292,7 +292,7 @@ class Node implements Serializable
         this.suffix = suffix;
     }
 
-    private void addidx(int index)
+    public void addIdx(int index)
     {
 //        if (lastIdx == data.length)
 //        {

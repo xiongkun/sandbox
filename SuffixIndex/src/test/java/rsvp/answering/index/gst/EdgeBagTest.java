@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.abahgat.suffixtree;
+package rsvp.answering.index.gst;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
+import rsvp.answering.index.gst.EdgeBag;
+import rsvp.answering.index.gst.GSuffixTree;
 import static org.junit.Assert.*;
 
 public class EdgeBagTest

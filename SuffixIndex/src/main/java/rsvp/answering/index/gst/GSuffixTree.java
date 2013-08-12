@@ -13,15 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.abahgat.suffixtree;
+package rsvp.answering.index.gst;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -92,30 +90,7 @@ public class GSuffixTree
         activeLeaf = root;
     }
 
-    @SuppressWarnings("unchecked")
     public GSuffixTree(String path)
-    {
-        try
-        {
-            System.out.print("Loading...");
-            long t1 = System.currentTimeMillis();
-            ObjectInputStream nodesInput = new ObjectInputStream(new FileInputStream(path + ".nodes"));
-            nodes = (ArrayList<Node>) nodesInput.readObject();
-            nodesInput.close();
-
-            ObjectInputStream edgesInput = new ObjectInputStream(new FileInputStream(path + ".edges"));
-            edges = (ArrayList<Edge>) edgesInput.readObject();
-            edgesInput.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    public GSuffixTree(String path, boolean inJson)
     {
         try
         {
@@ -160,30 +135,8 @@ public class GSuffixTree
             ex.printStackTrace();
         }
     }
-
+    
     public void toFile(String path)
-    {
-        try
-        {
-            long t1 = System.currentTimeMillis();
-            System.out.print("Writing...");
-            ObjectOutputStream edgesOut = new ObjectOutputStream(new FileOutputStream(path + ".edges"));
-            edgesOut.writeObject(edges);
-            edgesOut.close();
-
-            ObjectOutputStream nodesOut = new ObjectOutputStream(new FileOutputStream(path + ".nodes"));
-            nodesOut.writeObject(nodes);
-            nodesOut.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    public void toJSONFile(String path)
     {
         try
         {
@@ -321,6 +274,61 @@ public class GSuffixTree
         return null;
     }
 
+    
+    /**
+     * Take word as prefix, searches for the longest match.
+     * 
+     * @param word the key to search for
+     * @return matched word for the given word
+     */
+    public String match(String word)
+    {
+        /*
+         * Verifies if exists a path from the root to a node such that the concatenation of all the labels on the path
+         * is a superstring of the given word. If such a path is found, the last node on it is returned.
+         */
+        StringBuffer result = new StringBuffer();
+        int currentNode = root;
+        int currentEdge = -1;
+
+        for (int i = 0; i < word.length(); ++i)
+        {
+            char ch = word.charAt(i);
+            // follow the edge corresponding to this char
+            currentEdge = node(currentNode).getEdge(ch);
+            if (-1 == currentEdge)
+            {
+                // there is no edge starting with this char
+                return null;
+            }
+            else
+            {
+                String label = edge(currentEdge).getLabel();
+                result.append(label);
+                int lenToMatch = Math.min(word.length() - i, label.length());
+                if (!word.regionMatches(i, label, 0, lenToMatch))
+                {
+                    // the label on the edge does not correspond to the one in
+                    // the string to search
+                    return null;
+                }
+
+                if (label.length() >= word.length() - i)
+                {
+                    return result.toString();
+                }
+                else
+                {
+                    // advance to next node
+                    currentNode = edge(currentEdge).getDest();
+                    i += lenToMatch - 1;
+                }
+            }
+        }
+
+        return null;
+    }
+    
     /**
      * Adds the specified <tt>index</tt> to the GST under the given <tt>key</tt> .
      * 
@@ -625,7 +633,7 @@ public class GSuffixTree
         return nodes.size() - 1;
     }
 
-    public static int createEdge(String rest, int leaf)
+    protected static int createEdge(String rest, int leaf)
     {
         edges.add(new Edge(rest, leaf));
         return edges.size() - 1;

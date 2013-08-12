@@ -13,11 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.abahgat.suffixtree;
+package rsvp.answering.index.gst;
 
 import java.util.Set;
 
-import com.abahgat.suffixtree.Utils;
+import rsvp.answering.index.gst.Utils;
+
 import junit.framework.TestCase;
 
 public class UtilsTest extends TestCase {

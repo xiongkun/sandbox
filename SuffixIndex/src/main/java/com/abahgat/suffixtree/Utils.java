@@ -25,10 +25,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
-
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 
 public class Utils
 {
@@ -144,15 +142,15 @@ public class Utils
     @SuppressWarnings("unchecked")
     public static String toJSONString(Edge edge)
     {
-        JsonArray obj = new JsonArray();
-        JsonElement ele = JsonElement()
-        obj.add(JsonElement)
+        JSONArray obj = new JSONArray();
+        obj.add(edge.getLabel());
+        obj.add(edge.getDest());
         return obj.toJSONString();
     }
 
     public static Edge toEdge(String s)
     {
-        JsonArray obj = (JsonArray) JSONValue.parse(s);
+        JSONArray obj = (JSONArray) JSONValue.parse(s);
         String label = (String) obj.get(0);
         int dest = (Integer) obj.get(1);
         Edge e = new Edge(label, dest);
@@ -162,15 +160,15 @@ public class Utils
     @SuppressWarnings("unchecked")
     public static String toJSONString(Node node)
     {
-        JsonArray obj = new JsonArray();
-        JsonArray data = new JsonArray();
+        JSONArray obj = new JSONArray();
+        JSONArray data = new JSONArray();
         for (int ind : node.getData())
         {
             data.add(ind);
         }
         obj.add(data);
-        JsonArray keys = new JsonArray();
-        JsonArray values = new JsonArray();
+        JSONArray keys = new JSONArray();
+        JSONArray values = new JSONArray();
         for (char key : node.getEdges().keySet())
         {
             keys.add(key);
@@ -184,21 +182,14 @@ public class Utils
     public static Node toNode(String s)
     {
         Node node = new Node();
-        JsonArray obj = (JsonArray) JSONValue.parse(s);
+        JSONArray obj = (JSONArray) JSONValue.parse(s);
 
-        JsonArray data = (JsonArray) obj.get(0);
-        JsonArray keys = (JsonArray) obj.get(1);
-        JsonArray values = (JsonArray) obj.get(2);
+        JSONArray data = (JSONArray) obj.get(0);
+        JSONArray keys = (JSONArray) obj.get(1);
+        JSONArray values = (JSONArray) obj.get(2);
         for (Object idx : data)
         {
-            try
-            {
-                node.addIdx((Integer) idx);
-            }
-            catch (Exception e)
-            {
-                System.out.println("## "+idx);
-            }
+            node.addIdx((Integer) idx);
         }
         for (int i = 0; i < keys.size(); i++)
         {
@@ -218,17 +209,17 @@ public class Utils
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        GSuffixTree tree = generateFromFile("data/poi2.txt");
+        GSuffixTree tree = generateFromFile("data/poi.txt");
 
-        tree.toJSONFile("data/poi2");
+        tree.toJSONFile("data/poi");
 
-        GSuffixTree tree2 = new GSuffixTree("data/poi2", true);
+        GSuffixTree tree2 = new GSuffixTree("data/poi", true);
 
-        System.out.println(GSuffixTree.nodes.size());
+        System.out.println("Nodes : " + GSuffixTree.nodes.size());
 
-        System.out.println(GSuffixTree.edges.size());
+        System.out.println("Edges : " + GSuffixTree.edges.size());
 
-        System.out.println(tree2.search("岗"));
-        
+//        System.out.println(tree2.search("岗"));
+
     }
 }

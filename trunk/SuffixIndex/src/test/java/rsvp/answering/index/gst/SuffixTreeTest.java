@@ -13,13 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.abahgat.suffixtree;
+package rsvp.answering.index.gst;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
+
+import rsvp.answering.index.gst.GSuffixTree;
+import rsvp.answering.index.gst.Node;
 import junit.framework.TestCase;
-import static com.abahgat.suffixtree.Utils.getSubstrings;
+import static rsvp.answering.index.gst.Utils.getSubstrings;
 
 public class SuffixTreeTest extends TestCase {
 

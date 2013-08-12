@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.abahgat.suffixtree;
+package rsvp.answering.index.gst;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -211,9 +211,9 @@ public class Utils
 
         GSuffixTree tree = generateFromFile("data/poi.txt");
 
-        tree.toJSONFile("data/poi");
+        tree.toFile("data/poi");
 
-        GSuffixTree tree2 = new GSuffixTree("data/poi", true);
+        GSuffixTree tree2 = new GSuffixTree("data/poi");
 
         System.out.println("Nodes : " + GSuffixTree.nodes.size());
 

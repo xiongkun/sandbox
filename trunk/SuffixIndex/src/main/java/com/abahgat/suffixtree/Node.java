@@ -136,7 +136,7 @@ class Node implements Serializable
         {
             if (-1 == numElements || ret.size() < numElements)
             {
-                for (int num : GSuffixTree.nodes.get(GSuffixTree.edges.get(e).getDest()).getData(missingItems))
+                for (int num : GSuffixTree.node(GSuffixTree.edge(e).getDest()).getData(missingItems))
                 {
                     ret.add(num);
                     if (ret.size() == numElements)
@@ -222,7 +222,7 @@ class Node implements Serializable
         {
             for (int e : edges.values())
             {
-                GSuffixTree.nodes.get(GSuffixTree.edges.get(e).getDest()).computeAndCacheCount();
+                GSuffixTree.node(GSuffixTree.edge(e).getDest()).computeAndCacheCount();
             }
         }
 

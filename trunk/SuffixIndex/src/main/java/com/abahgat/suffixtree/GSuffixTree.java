@@ -121,21 +121,37 @@ public class GSuffixTree
         {
             System.out.print("Loading...");
             long t1 = System.currentTimeMillis();
-            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.json"), "utf-8"));
-            String line = null;
-            while ((line = nReader.readLine()) != null)
-            {
-                nodes.add(Utils.toNode(line));
-            }
-            nReader.close();
 
             BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.json"), "utf-8"));
-            line = null;
+            String line = null;
             while ((line = eReader.readLine()) != null)
             {
-                edges.add(Utils.toEdge(line));
+                // edges.add(Utils.toEdge(line));
+                String[] iss = line.split("[\t]");
+                edges.add(new Edge(iss[0], Integer.parseInt(iss[1])));
             }
             eReader.close();
+
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.json"), "utf-8"));
+            line = null;
+            while ((line = nReader.readLine()) != null)
+            {
+                // nodes.add(Utils.toNode(line));
+                Node node = new Node();
+                String[] iss = line.split("[\t]");
+                for (String is : iss)
+                {
+                    node.addIdx(Integer.parseInt(is));
+                }
+                line = nReader.readLine();
+                iss = line.split("[\t]");
+                for (int i = 0; i < iss.length - 1; i = i + 2)
+                {
+                    node.addEdge(iss[0].charAt(0), Integer.parseInt(iss[1]));
+                }
+                nodes.add(node);
+            }
+            nReader.close();
             long t2 = System.currentTimeMillis();
             System.out.println("Done : " + (t2 - t1) + "ms");
         }
@@ -174,16 +190,28 @@ public class GSuffixTree
             long t1 = System.currentTimeMillis();
             System.out.print("Writing...");
             BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.json"), "utf-8"));
-            for(Edge edge : edges)
+            for (Edge edge : edges)
             {
-                eWriter.append(Utils.toJSONString(edge)).append("\n");
+                // eWriter.append(Utils.toJSONString(edge)).append("\n");
+                eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
             }
             eWriter.close();
 
             BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.json"), "utf-8"));
-            for(Node node : nodes)
+            for (Node node : nodes)
             {
-                nWriter.append(Utils.toJSONString(node)).append("\n");
+                // nWriter.append(Utils.toJSONString(node)).append("\n");
+                for (int idx : node.getData())
+                {
+                    nWriter.append(idx + "\t");
+                }
+                nWriter.append("\n");
+
+                for (char ch : node.getEdges().keySet())
+                {
+                    nWriter.append(ch + "\t").append(node.getEdges().get(ch) + "\t");
+                }
+                nWriter.append("\n");
             }
             nWriter.close();
             long t2 = System.currentTimeMillis();

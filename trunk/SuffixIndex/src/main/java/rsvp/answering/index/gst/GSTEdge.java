@@ -15,17 +15,12 @@
  */
 package rsvp.answering.index.gst;
 
-import java.io.Serializable;
 
 /**
  * Represents an Edge in the Suffix Tree. It has a label and a destination Node
  */
-class GSTEdge implements Serializable
+class GSTEdge
 {
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -4913241802694723624L;
 
     private String label;
 

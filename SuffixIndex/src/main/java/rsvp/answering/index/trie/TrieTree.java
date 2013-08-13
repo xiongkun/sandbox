@@ -25,13 +25,15 @@ public class TrieTree
 {
     public static ArrayList<TrieNode> nodes = new ArrayList<TrieNode>();
 
+    public static ArrayList<TrieEdge> edges = new ArrayList<TrieEdge>();
+
     // private Map<Character, Integer> roots = new HashMap<Character, Integer>();
 
     private int root = 0;
 
     public TrieTree()
     {
-        root = createNode('\0', "");
+        root = createNode();
     }
 
     public TrieTree(String path)
@@ -41,7 +43,7 @@ public class TrieTree
             System.out.print("Loading...");
             long t1 = System.currentTimeMillis();
 
-            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.json"), "utf-8"));
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".trie"), "utf-8"));
             String line = null;
             while ((line = nReader.readLine()) != null)
             {
@@ -74,14 +76,14 @@ public class TrieTree
             long t1 = System.currentTimeMillis();
             System.out.print("Writing...");
 
-            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.json"), "utf-8"));
+            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".trie"), "utf-8"));
             for (TrieNode node : nodes)
             {
-                nWriter.append(node.getChar() + "\t").append(node.getLable()).append("\t").append(node.isWord() + "\n");
+                nWriter.append(node.getChar() + "\t").append(node.getValue()).append("\t").append(node.isWord() + "\n");
 
-                for (char ch : node.getChildrenMap().keySet())
+                for (char ch : node.getEdges().keySet())
                 {
-                    nWriter.append(ch + "\t").append(node.getChildrenMap().get(ch) + "\t");
+                    nWriter.append(ch + "\t").append(node.getEdges().get(ch) + "\t");
                 }
                 nWriter.append("\n");
             }
@@ -103,22 +105,22 @@ public class TrieTree
     // }
     // }
 
-    public void addWord(String argWord)
-    {
-        if (argWord != null && !argWord.trim().isEmpty())
-            addWord(argWord.toCharArray());
-    }
+    // public void addWord(String argWord)
+    // {
+    // if (argWord != null && !argWord.trim().isEmpty())
+    // addWord(argWord.toCharArray());
+    // }
 
     private void addWord(char[] argWord)
     {
 
-        if (!node(root).containsChild(argWord[0]))
+        if (!node(root).containsEdge(argWord[0]))
         {
             int newNodeIdx = TrieTree.createNode(argWord[0], "" + argWord[0]);
             node(root).putChild(argWord[0], newNodeIdx);
         }
 
-        int  currentNodeIdx = node(root).getChild(argWord[0]);
+        int currentNodeIdx = node(root).getEdge(argWord[0]);
 
         // int currentNodeIdx = node(root).getChild(argWord[0]);
         //
@@ -130,16 +132,118 @@ public class TrieTree
 
         for (int i = 1; i < argWord.length; i++)
         {
-            if (node(currentNodeIdx).getChild(argWord[i]) == -1)
+            if (node(currentNodeIdx).getEdge(argWord[i]) == -1)
             {
-                int newNodeIdx = TrieTree.createNode(argWord[i], node(currentNodeIdx).getLable() + argWord[i]);
+                int newNodeIdx = TrieTree.createNode(argWord[i], node(currentNodeIdx).getValue() + argWord[i]);
                 node(currentNodeIdx).putChild(argWord[i], newNodeIdx);
             }
 
-            currentNodeIdx = node(currentNodeIdx).getChild(argWord[i]);
+            currentNodeIdx = node(currentNodeIdx).getEdge(argWord[i]);
         }
 
         node(currentNodeIdx).setIsWord(true);
+    }
+
+    private void addWord(String word)
+    {
+        // char firstChar = word.charAt(0);
+        // if (!node(root).containsChild(firstChar))
+        // {
+        // int newNodeIdx = TrieTree.createNode(firstChar, word);
+        // node(root).putChild(firstChar, newNodeIdx);
+        // return;
+        // }
+        //
+        // int currentNodeIdx = node(root).getChild(firstChar);
+        //
+        // // int currentNodeIdx = node(root).getChild(argWord[0]);
+        // //
+        // // if (currentNodeIdx == -1)
+        // // {
+        // // int newNodeIdx = TrieTree.createNode(argWord[0], Character.toString(argWord[0]));
+        // // node(root).putChild(argWord[0], newNodeIdx);
+        // // }
+        // int i = 1;
+        // while (i < word.length())
+        // {
+        // if (node(currentNodeIdx).getChild(word.charAt(i)) == -1)
+        // {
+        // int newNodeIdx = TrieTree.createNode(word[i], node(currentNodeIdx).getValue() + word[i]);
+        // node(currentNodeIdx).putChild(word[i], newNodeIdx);
+        // }
+        //
+        // currentNodeIdx = node(currentNodeIdx).getChild(word[i]);
+        // }
+        //
+        // node(currentNodeIdx).setIsWord(true);
+    }
+
+    private void addWord(String word, int nodeIdx)
+    {
+        // char firstChar = word.charAt(0);
+        // if (!node(nodeIdx).containsEdge(firstChar))
+        // {
+        // int newNodeIdx = createNode();
+        // int newEdgeIdx = createEdge(word, newNodeIdx);
+        // node(nodeIdx).addEdge(firstChar, newEdgeIdx);
+        // return;
+        // }
+
+        int edgeIdx = node(nodeIdx).getEdge(word.charAt(i));
+        if (edgeIdx == -1)
+        {
+            // create -> (edge -> node) for last whole string
+            int newNodeIdx = createNode();
+            int newEdgeIdx = createEdge(word, newNodeIdx);
+            node(nodeIdx).addEdge(word.charAt(i), newEdgeIdx);
+            return;
+        }
+        String lable = edge(edgeIdx).getLabel();
+        for (int i = 0; i < lable.length(); i++)
+        {
+            if (i >= word.length()) // the end
+            {
+                node(edge(edgeIdx).getDest()).setIsWord(true);
+                return;
+            }
+            else
+            {
+                if (word.charAt(i) == lable.charAt(i))
+                {
+                    i++;
+                    continue;
+                }
+                else
+                {
+                    split(i,nodeIdx);
+                }
+            }
+
+
+            if (node(currentNodeIdx).getEdge(word.charAt(i)) == -1)
+            {
+
+                // int newNodeIdx = TrieTree.createNode(word[i], node(currentNodeIdx).getValue() + word[i]);
+                // node(currentNodeIdx).putChild(word[i], newNodeIdx);
+            }
+
+            currentNodeIdx = node(currentNodeIdx).getEdge(word[i]);
+        }
+
+        node(currentNodeIdx).setIsWord(true);
+    }
+
+    private void split(int nodeIdx, int cutPos)
+    {
+        String orgLable = node(nodeIdx).getLable();
+
+        String newLable = orgLable.substring(0, cutPos);
+
+        node(nodeIdx).setLable(newLable);
+
+        String lastLable = orgLable.substring(cutPos);
+
+        addWord(lastLable, nodeIdx);
     }
 
     public boolean containsPrefix(String argPrefix)
@@ -163,12 +267,6 @@ public class TrieTree
         return getNode(argString.toCharArray());
     }
 
-    @Override
-    public String toString()
-    {
-        return node(root).toString();
-    }
-
     private boolean contains(char[] argString, boolean argIsWord)
     {
         int node = getNode(argString);
@@ -177,11 +275,11 @@ public class TrieTree
 
     private int getNode(char[] argString)
     {
-        int currentNode = node(root).getChild(argString[0]);
+        int currentNode = node(root).getEdge(argString[0]);
 
         for (int i = 1; i < argString.length && currentNode != -1; i++)
         {
-            currentNode = node(currentNode).getChild(argString[i]);
+            currentNode = node(currentNode).getEdge(argString[i]);
 
             if (currentNode == -1)
             {
@@ -197,9 +295,20 @@ public class TrieTree
         return nodes.get(index);
     }
 
-    protected static int createNode(char argChar, String argValue)
+    protected static TrieEdge edge(int index)
     {
-        nodes.add(new TrieNode(argChar, argValue));
+        return edges.get(index);
+    }
+
+    protected static int createEdge(String lable, int dest)
+    {
+        edges.add(new TrieEdge(lable, dest));
+        return edges.size() - 1;
+    }
+
+    protected static int createNode()
+    {
+        nodes.add(new TrieNode());
         return nodes.size() - 1;
     }
 

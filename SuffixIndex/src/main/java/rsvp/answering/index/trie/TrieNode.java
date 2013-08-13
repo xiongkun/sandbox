@@ -16,65 +16,33 @@ import java.util.Map;
 public class TrieNode
 {
 
-    private final Character ch;
-
-    private String lable;
-
-    private Map<Character, Integer> children = new HashMap<Character, Integer>();
+    private Map<Character, Integer> edges = new HashMap<Character, Integer>();
 
     private boolean isValidWord;
 
-    public TrieNode(char argChar, String argValue)
+    public TrieNode()
     {
-        ch = argChar;
-        lable = argValue;
     }
 
-//    public void addChild(int argChild)
-//    {
-////        if (children.containsKey(Character.toString(TrieTree.node(argChild).getChar())))
-////        {
-////            return false;
-////        }
-//
-//        children.put(TrieTree.node(argChild).getChar(), argChild);
-////        return true;
-//    }
-    
-    public void putChild(char ch, int argChild)
+    public void addEdge(char ch, int argChild)
     {
-        children.put(ch, argChild);
+        edges.put(ch, argChild);
     }
 
-    public boolean containsChild(char c)
+    public boolean containsEdge(char c)
     {
-        return children.containsKey(c);
+        return edges.containsKey(c);
     }
 
-    public String getLable()
+    public Map<Character, Integer> getEdges()
     {
-        return lable;
-    }
-    
-    public void setLable(String lable)
-    {
-         this.lable = lable;
+        return edges;
     }
 
-    public char getChar()
+    public int getEdge(char c)
     {
-        return ch;
-    }
-    
-    public Map<Character, Integer> getChildrenMap()
-    {
-        return children;
-    }
-
-    public int getChild(char c)
-    {
-        Integer idx =  children.get(c);
-        if(idx ==null)
+        Integer idx = edges.get(c);
+        if (idx == null)
         {
             return -1;
         }
@@ -89,11 +57,6 @@ public class TrieNode
     public void setIsWord(boolean argIsWord)
     {
         isValidWord = argIsWord;
-    }
-
-    public String toString()
-    {
-        return lable;
     }
 
 }

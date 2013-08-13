@@ -41,7 +41,7 @@ public class TrieTree
             System.out.print("Loading...");
             long t1 = System.currentTimeMillis();
 
-            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".trie"), "utf-8"));
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.json"), "utf-8"));
             String line = null;
             while ((line = nReader.readLine()) != null)
             {
@@ -74,10 +74,10 @@ public class TrieTree
             long t1 = System.currentTimeMillis();
             System.out.print("Writing...");
 
-            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".trie"), "utf-8"));
+            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.json"), "utf-8"));
             for (TrieNode node : nodes)
             {
-                nWriter.append(node.getChar() + "\t").append(node.getValue()).append("\t").append(node.isWord() + "\n");
+                nWriter.append(node.getChar() + "\t").append(node.getLable()).append("\t").append(node.isWord() + "\n");
 
                 for (char ch : node.getChildrenMap().keySet())
                 {
@@ -132,7 +132,7 @@ public class TrieTree
         {
             if (node(currentNodeIdx).getChild(argWord[i]) == -1)
             {
-                int newNodeIdx = TrieTree.createNode(argWord[i], node(currentNodeIdx).getValue() + argWord[i]);
+                int newNodeIdx = TrieTree.createNode(argWord[i], node(currentNodeIdx).getLable() + argWord[i]);
                 node(currentNodeIdx).putChild(argWord[i], newNodeIdx);
             }
 

@@ -13,7 +13,7 @@ import java.util.Map;
  * @author Kun Xiong (xiongkun04@gmail.com)
  * @date 2013-08-12
  */
-public class TrieNode
+public class TrieEdge
 {
 
     private final Character ch;
@@ -24,23 +24,23 @@ public class TrieNode
 
     private boolean isValidWord;
 
-    public TrieNode(char argChar, String argValue)
+    public TrieEdge(char argChar, String argValue)
     {
         ch = argChar;
         lable = argValue;
     }
 
-//    public void addChild(int argChild)
-//    {
-////        if (children.containsKey(Character.toString(TrieTree.node(argChild).getChar())))
-////        {
-////            return false;
-////        }
-//
-//        children.put(TrieTree.node(argChild).getChar(), argChild);
-////        return true;
-//    }
-    
+    // public void addChild(int argChild)
+    // {
+    // // if (children.containsKey(Character.toString(TrieTree.node(argChild).getChar())))
+    // // {
+    // // return false;
+    // // }
+    //
+    // children.put(TrieTree.node(argChild).getChar(), argChild);
+    // // return true;
+    // }
+
     public void putChild(char ch, int argChild)
     {
         children.put(ch, argChild);
@@ -55,17 +55,17 @@ public class TrieNode
     {
         return lable;
     }
-    
+
     public void setLable(String lable)
     {
-         this.lable = lable;
+        this.lable = lable;
     }
 
     public char getChar()
     {
         return ch;
     }
-    
+
     public Map<Character, Integer> getChildrenMap()
     {
         return children;
@@ -73,8 +73,8 @@ public class TrieNode
 
     public int getChild(char c)
     {
-        Integer idx =  children.get(c);
-        if(idx ==null)
+        Integer idx = children.get(c);
+        if (idx == null)
         {
             return -1;
         }

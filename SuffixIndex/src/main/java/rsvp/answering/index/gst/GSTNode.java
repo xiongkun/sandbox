@@ -15,7 +15,6 @@
  */
 package rsvp.answering.index.gst;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,13 +25,8 @@ import java.util.Set;
  * 
  * @see GSuffixTree
  */
-class GSTNode implements Serializable
+class GSTNode
 {
-
-    /**
-     * 
-     */
-    private static final long serialVersionUID = -9172485977425226381L;
 
     /**
      * The payload array used to store the data (indexes) associated with this node. In this case, it is used to store

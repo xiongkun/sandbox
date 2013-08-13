@@ -42,23 +42,6 @@ class GSTNode
     
     private HashSet<Integer> data;
 
-//    /**
-//     * Represents index of the last position used in the data int[] array.
-//     * 
-//     * It should always be less than data.length
-//     */
-//    private int lastIdx = 0;
-//
-//    /**
-//     * The starting size of the int[] array containing the payload
-//     */
-//    private static final int START_SIZE = 0;
-//
-//    /**
-//     * The increment in size used when the payload array is full
-//     */
-//    private static final int INCREMENT = 1;
-
     /**
      * The set of edges starting from this node
      */

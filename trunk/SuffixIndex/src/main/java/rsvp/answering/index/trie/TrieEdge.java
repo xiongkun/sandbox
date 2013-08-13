@@ -6,8 +6,6 @@
  */
 package rsvp.answering.index.trie;
 
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Kun Xiong (xiongkun04@gmail.com)
@@ -16,84 +14,34 @@ import java.util.Map;
 public class TrieEdge
 {
 
-    private final Character ch;
+    private String label;
 
-    private String lable;
+    private int dest;
 
-    private Map<Character, Integer> children = new HashMap<Character, Integer>();
-
-    private boolean isValidWord;
-
-    public TrieEdge(char argChar, String argValue)
+    public String getLabel()
     {
-        ch = argChar;
-        lable = argValue;
+        return label;
     }
 
-    // public void addChild(int argChild)
-    // {
-    // // if (children.containsKey(Character.toString(TrieTree.node(argChild).getChar())))
-    // // {
-    // // return false;
-    // // }
-    //
-    // children.put(TrieTree.node(argChild).getChar(), argChild);
-    // // return true;
-    // }
-
-    public void putChild(char ch, int argChild)
+    public void setLabel(String label)
     {
-        children.put(ch, argChild);
+        this.label = label;
     }
 
-    public boolean containsChild(char c)
+    public int getDest()
     {
-        return children.containsKey(c);
+        return dest;
     }
 
-    public String getLable()
+    public void setDest(int dest)
     {
-        return lable;
+        this.dest = dest;
     }
 
-    public void setLable(String lable)
+    public TrieEdge(String label, int dest)
     {
-        this.lable = lable;
-    }
-
-    public char getChar()
-    {
-        return ch;
-    }
-
-    public Map<Character, Integer> getChildrenMap()
-    {
-        return children;
-    }
-
-    public int getChild(char c)
-    {
-        Integer idx = children.get(c);
-        if (idx == null)
-        {
-            return -1;
-        }
-        return idx.intValue();
-    }
-
-    public boolean isWord()
-    {
-        return isValidWord;
-    }
-
-    public void setIsWord(boolean argIsWord)
-    {
-        isValidWord = argIsWord;
-    }
-
-    public String toString()
-    {
-        return lable;
+        this.label = label;
+        this.dest = dest;
     }
 
 }

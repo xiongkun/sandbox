@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * Represents an Edge in the Suffix Tree. It has a label and a destination Node
  */
-class Edge implements Serializable
+class GSTEdge implements Serializable
 {
     /**
      * 
@@ -51,7 +51,7 @@ class Edge implements Serializable
         this.dest = dest;
     }
 
-    public Edge(String label, int dest)
+    public GSTEdge(String label, int dest)
     {
         this.label = label;
         this.dest = dest;

@@ -26,7 +26,7 @@ import java.util.Set;
  * 
  * @see GSuffixTree
  */
-class Node implements Serializable
+class GSTNode implements Serializable
 {
 
     /**
@@ -84,14 +84,14 @@ class Node implements Serializable
      * 
      * This must be calculated explicitly using computeAndCacheCount
      * 
-     * @see Node#computeAndCacheCount()
+     * @see GSTNode#computeAndCacheCount()
      */
     private int resultCount = -1;
 
     /**
      * Creates a new Node
      */
-    Node()
+    GSTNode()
     {
         // edges = new EdgeBag();
         edges = new HashMap<Character, Integer>();
@@ -212,7 +212,7 @@ class Node implements Serializable
      * 
      * @param recursive if true, it performs the same operation on subnodes as well
      * @return the number of results
-     * @see Node#getResultCount()
+     * @see GSTNode#getResultCount()
      */
     public int computeAndCacheCount(boolean recursive)
     {
@@ -244,7 +244,7 @@ class Node implements Serializable
      * called computeAndCacheCount.
      * 
      * @throws IllegalStateException when this method is called without having called computeAndCacheCount first
-     * @see Node#computeAndCacheCount()
+     * @see GSTNode#computeAndCacheCount()
      * @todo this should raise an exception when the subtree is changed but count wasn't updated
      */
     public int getResultCount() throws IllegalStateException

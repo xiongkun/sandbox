@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package rsvp.answering.index.gst;
+package rsvp.answering.index.common;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -25,8 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
+import rsvp.answering.index.gst.GSuffixTree;
 
 public class Utils
 {
@@ -72,42 +71,6 @@ public class Utils
         return ret;
     }
 
-    public static GSuffixTree generateFromFile(String path)
-    {
-        long t1 = System.currentTimeMillis();
-        GSuffixTree tree = new GSuffixTree();
-        System.out.print("Loading words from " + path + " ...");
-        try
-        {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "utf-8"));
-            int index = 0;
-            String line = null;
-            while ((line = reader.readLine()) != null)
-            {
-                tree.put(line, index++);
-                if (index % 1000 == 0)
-                {
-                    System.out.println(index);
-                }
-            }
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + index + " : " + (t2 - t1) + "ms");
-            return tree;
-        }
-        catch (UnsupportedEncodingException e)
-        {
-            e.printStackTrace();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return null;
-    }
 
     public static HashMap<String, Integer> generateHashMap(String path)
     {
@@ -139,64 +102,64 @@ public class Utils
         return null;
     }
 
-    @SuppressWarnings("unchecked")
-    public static String toJSONString(Edge edge)
-    {
-        JSONArray obj = new JSONArray();
-        obj.add(edge.getLabel());
-        obj.add(edge.getDest());
-        return obj.toJSONString();
-    }
-
-    public static Edge toEdge(String s)
-    {
-        JSONArray obj = (JSONArray) JSONValue.parse(s);
-        String label = (String) obj.get(0);
-        int dest = (Integer) obj.get(1);
-        Edge e = new Edge(label, dest);
-        return e;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static String toJSONString(Node node)
-    {
-        JSONArray obj = new JSONArray();
-        JSONArray data = new JSONArray();
-        for (int ind : node.getData())
-        {
-            data.add(ind);
-        }
-        obj.add(data);
-        JSONArray keys = new JSONArray();
-        JSONArray values = new JSONArray();
-        for (char key : node.getEdges().keySet())
-        {
-            keys.add(key);
-            values.add(node.getEdges().get(key));
-        }
-        obj.add(keys);
-        obj.add(values);
-        return obj.toJSONString();
-    }
-
-    public static Node toNode(String s)
-    {
-        Node node = new Node();
-        JSONArray obj = (JSONArray) JSONValue.parse(s);
-
-        JSONArray data = (JSONArray) obj.get(0);
-        JSONArray keys = (JSONArray) obj.get(1);
-        JSONArray values = (JSONArray) obj.get(2);
-        for (Object idx : data)
-        {
-            node.addIdx((Integer) idx);
-        }
-        for (int i = 0; i < keys.size(); i++)
-        {
-            node.addEdge((Character) keys.get(i), (Integer) values.get(i));
-        }
-        return node;
-    }
+//    @SuppressWarnings("unchecked")
+//    public static String toJSONString(GSTEdge edge)
+//    {
+//        JSONArray obj = new JSONArray();
+//        obj.add(edge.getLabel());
+//        obj.add(edge.getDest());
+//        return obj.toJSONString();
+//    }
+//
+//    public static GSTEdge toEdge(String s)
+//    {
+//        JSONArray obj = (JSONArray) JSONValue.parse(s);
+//        String label = (String) obj.get(0);
+//        int dest = (Integer) obj.get(1);
+//        GSTEdge e = new GSTEdge(label, dest);
+//        return e;
+//    }
+//
+//    @SuppressWarnings("unchecked")
+//    public static String toJSONString(GSTNode node)
+//    {
+//        JSONArray obj = new JSONArray();
+//        JSONArray data = new JSONArray();
+//        for (int ind : node.getData())
+//        {
+//            data.add(ind);
+//        }
+//        obj.add(data);
+//        JSONArray keys = new JSONArray();
+//        JSONArray values = new JSONArray();
+//        for (char key : node.getEdges().keySet())
+//        {
+//            keys.add(key);
+//            values.add(node.getEdges().get(key));
+//        }
+//        obj.add(keys);
+//        obj.add(values);
+//        return obj.toJSONString();
+//    }
+//
+//    public static GSTNode toNode(String s)
+//    {
+//        GSTNode node = new GSTNode();
+//        JSONArray obj = (JSONArray) JSONValue.parse(s);
+//
+//        JSONArray data = (JSONArray) obj.get(0);
+//        JSONArray keys = (JSONArray) obj.get(1);
+//        JSONArray values = (JSONArray) obj.get(2);
+//        for (Object idx : data)
+//        {
+//            node.addIdx((Integer) idx);
+//        }
+//        for (int i = 0; i < keys.size(); i++)
+//        {
+//            node.addEdge((Character) keys.get(i), (Integer) values.get(i));
+//        }
+//        return node;
+//    }
 
     public static void main(String[] args)
     {
@@ -209,7 +172,7 @@ public class Utils
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        GSuffixTree tree = generateFromFile("data/poi.txt");
+        GSuffixTree tree = GSuffixTree.construct("data/poi.txt");
 
         tree.toFile("data/poi");
 
@@ -219,7 +182,7 @@ public class Utils
 
         System.out.println("Edges : " + GSuffixTree.edges.size());
 
-//        System.out.println(tree2.search("岗"));
+        System.out.println(tree2.computeCount());
 
     }
 }

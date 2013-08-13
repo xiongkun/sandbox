@@ -20,9 +20,9 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import rsvp.answering.index.gst.GSuffixTree;
-import rsvp.answering.index.gst.Node;
+import rsvp.answering.index.gst.GSTNode;
 import junit.framework.TestCase;
-import static rsvp.answering.index.gst.Utils.getSubstrings;
+import static rsvp.answering.index.common.Utils.getSubstrings;
 
 public class SuffixTreeTest extends TestCase {
 
@@ -207,7 +207,7 @@ public class SuffixTreeTest extends TestCase {
         assertNull(in.search("aoca"));
     }
 
-    private void testResultsCount(Node n) {
+    private void testResultsCount(GSTNode n) {
         for (int e : n.getEdges().values()) {
             assertEquals(n.getData(-1).size(), n.getResultCount());
             testResultsCount(GSuffixTree.node(GSuffixTree.edge(e).getDest()));

@@ -17,7 +17,7 @@ package rsvp.answering.index.gst;
 
 import java.util.Set;
 
-import rsvp.answering.index.gst.Utils;
+import rsvp.answering.index.common.Utils;
 
 import junit.framework.TestCase;
 

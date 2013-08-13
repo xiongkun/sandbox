@@ -18,9 +18,12 @@ package rsvp.answering.index.gst;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,9 +68,9 @@ import java.util.Collections;
 public class GSuffixTree
 {
 
-    public static ArrayList<Node> nodes = new ArrayList<Node>();
+    public static ArrayList<GSTNode> nodes = new ArrayList<GSTNode>();
 
-    public static ArrayList<Edge> edges = new ArrayList<Edge>();
+    public static ArrayList<GSTEdge> edges = new ArrayList<GSTEdge>();
 
     /**
      * The index of the last item that was added to the GST
@@ -97,22 +100,22 @@ public class GSuffixTree
             System.out.print("Loading...");
             long t1 = System.currentTimeMillis();
 
-            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.json"), "utf-8"));
+            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst"), "utf-8"));
             String line = null;
             while ((line = eReader.readLine()) != null)
             {
                 // edges.add(Utils.toEdge(line));
                 String[] iss = line.split("[\t]");
-                edges.add(new Edge(iss[0], Integer.parseInt(iss[1])));
+                edges.add(new GSTEdge(iss[0], Integer.parseInt(iss[1])));
             }
             eReader.close();
 
-            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.json"), "utf-8"));
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst"), "utf-8"));
             line = null;
             while ((line = nReader.readLine()) != null)
             {
                 // nodes.add(Utils.toNode(line));
-                Node node = new Node();
+                GSTNode node = new GSTNode();
                 String[] iss = line.split("[\t]");
                 for (String is : iss)
                 {
@@ -135,23 +138,23 @@ public class GSuffixTree
             ex.printStackTrace();
         }
     }
-    
+
     public void toFile(String path)
     {
         try
         {
             long t1 = System.currentTimeMillis();
             System.out.print("Writing...");
-            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.json"), "utf-8"));
-            for (Edge edge : edges)
+            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst"), "utf-8"));
+            for (GSTEdge edge : edges)
             {
                 // eWriter.append(Utils.toJSONString(edge)).append("\n");
                 eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
             }
             eWriter.close();
 
-            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.json"), "utf-8"));
-            for (Node node : nodes)
+            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst"), "utf-8"));
+            for (GSTNode node : nodes)
             {
                 // nWriter.append(Utils.toJSONString(node)).append("\n");
                 for (int idx : node.getData())
@@ -198,7 +201,7 @@ public class GSuffixTree
      */
     public Collection<Integer> search(String word, int results)
     {
-        Node tmpNode = searchNode(word);
+        GSTNode tmpNode = searchNode(word);
         if (tmpNode == null)
         {
             return null;
@@ -216,7 +219,7 @@ public class GSuffixTree
      */
     public ResultInfo searchWithCount(String word, int to)
     {
-        Node tmpNode = searchNode(word);
+        GSTNode tmpNode = searchNode(word);
         if (tmpNode == null)
         {
             return new ResultInfo(Collections.<Integer> emptyList(), 0);
@@ -228,7 +231,7 @@ public class GSuffixTree
     /**
      * Returns the tree node (if present) that corresponds to the given string.
      */
-    private Node searchNode(String word)
+    private GSTNode searchNode(String word)
     {
         /*
          * Verifies if exists a path from the root to a node such that the concatenation of all the labels on the path
@@ -274,7 +277,6 @@ public class GSuffixTree
         return null;
     }
 
-    
     /**
      * Take word as prefix, searches for the longest match.
      * 
@@ -328,7 +330,7 @@ public class GSuffixTree
 
         return null;
     }
-    
+
     /**
      * Adds the specified <tt>index</tt> to the GST under the given <tt>key</tt> .
      * 
@@ -339,7 +341,7 @@ public class GSuffixTree
      * @param index the value that will be added to the index
      * @throws IllegalStateException if an invalid index is passed as input
      */
-    public void put(String key, int index) throws IllegalStateException
+    protected void put(String key, int index) throws IllegalStateException
     {
         if (index < last)
         {
@@ -621,13 +623,13 @@ public class GSuffixTree
 
     private static int createNode()
     {
-        nodes.add(new Node());
+        nodes.add(new GSTNode());
         return nodes.size() - 1;
     }
 
     private static int createNode(int ref)
     {
-        Node n = new Node();
+        GSTNode n = new GSTNode();
         n.addRef(ref);
         nodes.add(n);
         return nodes.size() - 1;
@@ -635,21 +637,21 @@ public class GSuffixTree
 
     protected static int createEdge(String rest, int leaf)
     {
-        edges.add(new Edge(rest, leaf));
+        edges.add(new GSTEdge(rest, leaf));
         return edges.size() - 1;
     }
 
-    public static Node node(int index)
+    protected static GSTNode node(int index)
     {
         return nodes.get(index);
     }
 
-    public static Edge edge(int index)
+    protected static GSTEdge edge(int index)
     {
         return edges.get(index);
     }
 
-    Node getRoot()
+    protected GSTNode getRoot()
     {
         return node(root);
     }
@@ -722,17 +724,64 @@ public class GSuffixTree
         }
     }
 
+    public static GSuffixTree construct(String path)
+    {
+        long t1 = System.currentTimeMillis();
+        GSuffixTree tree = new GSuffixTree();
+        System.out.print("Loading words from " + path + " ...");
+        try
+        {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "utf-8"));
+            int index = 0;
+            String line = null;
+            while ((line = reader.readLine()) != null)
+            {
+                tree.put(line, index++);
+                if (index % 1000 == 0)
+                {
+                    System.out.println(index);
+                }
+            }
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + index + " : " + (t2 - t1) + "ms");
+            return tree;
+        }
+        catch (UnsupportedEncodingException e)
+        {
+            e.printStackTrace();
+        }
+        catch (FileNotFoundException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public static void main(String[] args)
     {
-        GSuffixTree in = new GSuffixTree();
-        String[] words = new String[]
-        { "白日依山尽", "飞流直下三千尺", "两只黄鹂鸣翠柳" };
-        for (int i = 0; i < words.length; ++i)
-        {
-            in.put(words[i], i);
-        }
+        // GSuffixTree in = new GSuffixTree();
+        // String[] words = new String[] { "白日依山尽", "飞流直下三千尺", "两只黄鹂鸣翠柳" };
+        // for (int i = 0; i < words.length; ++i) {
+        // in.put(words[i], i);
+        // }
+        //
+        // System.out.println(in.search("飞流"));
+        // System.out.println(in.search("两"));
 
-        System.out.println(in.search("飞流"));
+        GSuffixTree tree = construct("data/poi.txt");
 
+        tree.toFile("data/poi");
+
+        GSuffixTree tree2 = new GSuffixTree("data/poi");
+
+        System.out.println("Nodes : " + GSuffixTree.nodes.size());
+
+        System.out.println("Edges : " + GSuffixTree.edges.size());
+        
+        System.out.println(tree2.computeCount());
     }
 }

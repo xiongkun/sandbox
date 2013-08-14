@@ -125,7 +125,7 @@ public class GSuffixTree
                 iss = line.split("[\t]");
                 for (int i = 0; i < iss.length - 1; i = i + 2)
                 {
-                    node.addEdge(iss[0].charAt(0), Integer.parseInt(iss[1]));
+                    node.addEdge(iss[0].charAt(i), Integer.parseInt(iss[i + 1]));
                 }
                 nodes.add(node);
             }
@@ -139,7 +139,56 @@ public class GSuffixTree
         }
     }
 
-    public void toFile(String path)
+    public GSuffixTree(String path, boolean fromBinary)
+    {
+        try
+        {
+            System.out.print("Loading...");
+            long t1 = System.currentTimeMillis();
+
+            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst.bin"), "utf-8"));
+            int edgeNum = eReader.read();
+            for (int i = 0; i < edgeNum; i++)
+            {
+                int lableCharNum = eReader.read();
+                char[] lableChar = new char[lableCharNum];
+                eReader.read(lableChar);
+                int dest = eReader.read();
+                edges.add(new GSTEdge(new String(lableChar), dest));
+            }
+            eReader.close();
+
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst.bin"), "utf-8"));
+
+            int nodeNum = nReader.read();
+            for (int i = 0; i < nodeNum; i++)
+            {
+                GSTNode node = new GSTNode();
+                int dataNum = nReader.read();
+                for (int j = 0; j < dataNum; j++)
+                {
+                    node.addIdx(nReader.read());
+                }
+                int edgeMapNum = nReader.read();
+                for (int j = 0; j < edgeMapNum; j++)
+                {
+                    char ch = (char) nReader.read();
+                    node.addEdge(ch, nReader.read());
+                }
+                nodes.add(node);
+            }
+
+            nReader.close();
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + (t2 - t1) + "ms");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void toStringFile(String path)
     {
         try
         {
@@ -148,7 +197,6 @@ public class GSuffixTree
             BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst"), "utf-8"));
             for (GSTEdge edge : edges)
             {
-                // eWriter.append(Utils.toJSONString(edge)).append("\n");
                 eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
             }
             eWriter.close();
@@ -156,7 +204,6 @@ public class GSuffixTree
             BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst"), "utf-8"));
             for (GSTNode node : nodes)
             {
-                // nWriter.append(Utils.toJSONString(node)).append("\n");
                 for (int idx : node.getData())
                 {
                     nWriter.append(idx + "\t");
@@ -168,6 +215,48 @@ public class GSuffixTree
                     nWriter.append(ch + "\t").append(node.getEdges().get(ch) + "\t");
                 }
                 nWriter.append("\n");
+            }
+            nWriter.close();
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + (t2 - t1) + "ms");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
+    public void toBinaryFile(String path)
+    {
+        try
+        {
+            long t1 = System.currentTimeMillis();
+            System.out.print("Writing...");
+            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst.bin"), "utf-8"));
+            eWriter.write(edges.size());
+            for (GSTEdge edge : edges)
+            {
+                eWriter.write(edge.getLabel().length());
+                eWriter.write(edge.getLabel().toCharArray());
+                eWriter.write(edge.getDest());
+            }
+            eWriter.close();
+
+            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst.bin"), "utf-8"));
+            nWriter.write(nodes.size());
+            for (GSTNode node : nodes)
+            {
+                nWriter.write(node.getData().size());
+                for (int idx : node.getData())
+                {
+                    nWriter.write(idx);
+                }
+                nWriter.write(node.getEdges().size());
+                for (char ch : node.getEdges().keySet())
+                {
+                    nWriter.write(ch);
+                    nWriter.write(node.getEdges().get(ch));
+                }
             }
             nWriter.close();
             long t2 = System.currentTimeMillis();
@@ -772,16 +861,18 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        GSuffixTree tree = construct("data/poi.txt");
+        GSuffixTree tree = construct("data/poi2.txt");
 
-        tree.toFile("data/poi");
+        tree.toBinaryFile("data/poi2");
 
-        GSuffixTree tree2 = new GSuffixTree("data/poi");
+        GSuffixTree tree2 = new GSuffixTree("data/poi2", true);
 
         System.out.println("Nodes : " + GSuffixTree.nodes.size());
 
         System.out.println("Edges : " + GSuffixTree.edges.size());
-        
-        System.out.println(tree2.computeCount());
+
+        System.out.println(tree.search("门"));
+        System.out.println(tree2.search("门"));
+//        System.out.println(tree2.computeCount());
     }
 }

@@ -174,7 +174,7 @@ public class Utils
 
         GSuffixTree tree = GSuffixTree.construct("data/poi.txt");
 
-        tree.toFile("data/poi");
+        tree.toStringFile("data/poi");
 
         GSuffixTree tree2 = new GSuffixTree("data/poi");
 

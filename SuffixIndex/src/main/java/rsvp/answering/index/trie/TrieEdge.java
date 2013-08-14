@@ -6,7 +6,6 @@
  */
 package rsvp.answering.index.trie;
 
-
 /**
  * @author Kun Xiong (xiongkun04@gmail.com)
  * @date 2013-08-12
@@ -17,6 +16,12 @@ public class TrieEdge
     private String label;
 
     private int dest;
+
+    public TrieEdge(String label, int dest)
+    {
+        this.label = label;
+        this.dest = dest;
+    }
 
     public String getLabel()
     {
@@ -38,10 +43,10 @@ public class TrieEdge
         this.dest = dest;
     }
 
-    public TrieEdge(String label, int dest)
+    @Override
+    public String toString()
     {
-        this.label = label;
-        this.dest = dest;
+        return "TrieEdge [label=" + label + ", dest=" + dest + "]";
     }
 
 }

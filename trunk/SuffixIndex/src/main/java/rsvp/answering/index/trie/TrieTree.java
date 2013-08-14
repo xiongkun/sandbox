@@ -194,21 +194,6 @@ public class TrieTree
         node(midNode).addEdge(lastWord.charAt(0), branchEdge);
     }
 
-//    public boolean containsPrefix(String argPrefix)
-//    {
-//        return contains(argPrefix.toCharArray(), false);
-//    }
-//
-//    public boolean containsWord(String argWord)
-//    {
-//        return contains(argWord.toCharArray(), true);
-//    }
-//
-//    public int getWord(String argString)
-//    {
-//        int node = getNode(argString.toCharArray());
-//        return node != -1 && node(node).isWord() ? node : null;
-//    }
 
     public int getPrefix(String argString)
     {
@@ -221,7 +206,7 @@ public class TrieTree
         return (node != -1 && node(node).isWord() && argIsWord) || (!argIsWord && node != -1);
     }
 
-    private int getNode(String word)
+    private String search(String word,StringBuffer matched)
     {
         StringBuffer result = new StringBuffer();
         int nodeIdx = root;
@@ -230,7 +215,7 @@ public class TrieTree
             int edgeIdx = node(nodeIdx).getEdge(word.charAt(j));
             if (edgeIdx == -1)
             {
-                return -1;
+                return result.toString();
             }
             else
             // match through edge
@@ -240,24 +225,34 @@ public class TrieTree
                 {
                     if (j >= word.length()) // the end
                     {
-                        return edgeIdx;
+                        while(i < lable.length())
+                        {
+                            
+                        }
                     }
                     else
                     {
                         if (word.charAt(j) == lable.charAt(i)) // next character
                         {
+                            result.append(lable.charAt(i));
                             j++;
                         }
                         else
                         {
-                            return;
+                            return null;
                         }
                     }
                 }
                 
                 
             }
+            lastEdgeIdx = edgeIdx;
         }
+    }
+    
+    private void goDown(int nodeIds, StringBuffer result)
+    {
+        if()
     }
 
     protected static TrieNode node(int index)

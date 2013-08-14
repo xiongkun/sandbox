@@ -18,17 +18,10 @@ public class TrieNode
 
     private Map<Character, Integer> edges = new HashMap<Character, Integer>();
 
-//    private boolean isValidWord;
-
     public TrieNode()
     {
     }
     
-//    public TrieNode(boolean isWord)
-//    {
-//        this.isValidWord = isWord;
-//    }
-
     public void addEdge(char ch, int argChild)
     {
         edges.put(ch, argChild);
@@ -54,14 +47,10 @@ public class TrieNode
         return idx.intValue();
     }
 
-//    public boolean isWord()
-//    {
-//        return isValidWord;
-//    }
-//
-//    public void setIsWord(boolean argIsWord)
-//    {
-//        isValidWord = argIsWord;
-//    }
-
+    
+    @Override
+    public String toString()
+    {
+        return edges.toString();
+    }
 }

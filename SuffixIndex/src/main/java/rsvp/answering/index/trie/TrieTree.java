@@ -7,10 +7,13 @@
 package rsvp.answering.index.trie;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
@@ -33,46 +36,45 @@ public class TrieTree
         root = createNode();
     }
 
-    // public TrieTree(String path)
-    // {
-    // try
-    // {
-    // System.out.print("Loading...");
-    // long t1 = System.currentTimeMillis();
-    //
-    // BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.trie"),
-    // "utf-8"));
-    // String line = null;
-    // while ((line = eReader.readLine()) != null)
-    // {
-    // String[] iss = line.split("[\t]");
-    // edges.add(new TrieEdge(iss[0], Integer.parseInt(iss[1])));
-    // }
-    // eReader.close();
-    //
-    // BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.trie"),
-    // "utf-8"));
-    // line = null;
-    // while ((line = nReader.readLine()) != null)
-    // {
-    // TrieNode node = new TrieNode();
-    // String[] iss = line.split("[\t]");
-    //
-    // for (int i = 0; i < iss.length - 1; i = i + 2)
-    // {
-    // node.addEdge(iss[0].charAt(0), Integer.parseInt(iss[1]));
-    // }
-    // nodes.add(node);
-    // }
-    // nReader.close();
-    // long t2 = System.currentTimeMillis();
-    // System.out.println("Done : " + (t2 - t1) + "ms");
-    // }
-    // catch (Exception ex)
-    // {
-    // ex.printStackTrace();
-    // }
-    // }
+    public TrieTree(String path, boolean fromFile)
+    {
+        try
+        {
+            System.out.print("Loading...");
+            long t1 = System.currentTimeMillis();
+
+            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.trie"), "utf-8"));
+            String line = null;
+            while ((line = eReader.readLine()) != null)
+            {
+                String[] iss = line.split("[\t]");
+                edges.add(new TrieEdge(iss[0], Integer.parseInt(iss[1])));
+            }
+            eReader.close();
+
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.trie"), "utf-8"));
+            line = null;
+            while ((line = nReader.readLine()) != null)
+            {
+                TrieNode node = new TrieNode();
+                String[] iss = line.split("[\t]");
+
+                for (int i = 0; i < iss.length - 1; i = i + 2)
+                {
+                    node.addEdge(iss[0].charAt(i), Integer.parseInt(iss[i + 1]));
+                }
+                nodes.add(node);
+            }
+            nReader.close();
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + (t2 - t1) + "ms");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
+
     public TrieTree(String path)
     {
         root = createNode();
@@ -110,38 +112,38 @@ public class TrieTree
         }
     }
 
-//    public void toFile(String path)
-//    {
-//        try
-//        {
-//            long t1 = System.currentTimeMillis();
-//            System.out.print("Writing...");
-//            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.trie"), "utf-8"));
-//            for (TrieEdge edge : edges)
-//            {
-//                eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
-//            }
-//            eWriter.close();
-//
-//            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.trie"), "utf-8"));
-//            for (TrieNode node : nodes)
-//            {
-//                // nWriter.append(node.isWord() + "\t");
-//                for (char ch : node.getEdges().keySet())
-//                {
-//                    nWriter.append(Character.toString(ch)).append("\t").append(node.getEdges().get(ch) + "\t");
-//                }
-//                nWriter.append("\n");
-//            }
-//            nWriter.close();
-//            long t2 = System.currentTimeMillis();
-//            System.out.println("Done : " + (t2 - t1) + "ms");
-//        }
-//        catch (Exception ex)
-//        {
-//            ex.printStackTrace();
-//        }
-//    }
+    public void toFile(String path)
+    {
+        try
+        {
+            long t1 = System.currentTimeMillis();
+            System.out.print("Writing...");
+            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.trie"), "utf-8"));
+            for (TrieEdge edge : edges)
+            {
+                eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
+            }
+            eWriter.close();
+
+            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.trie"), "utf-8"));
+            for (TrieNode node : nodes)
+            {
+                // nWriter.append(node.isWord() + "\t");
+                for (char ch : node.getEdges().keySet())
+                {
+                    nWriter.append(Character.toString(ch)).append("\t").append(node.getEdges().get(ch) + "\t");
+                }
+                nWriter.append("\n");
+            }
+            nWriter.close();
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + (t2 - t1) + "ms");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
 
     private void addWord(String word)
     {

@@ -1,1 +1,1 @@
-mvn exec:java -Dexec.mainClass="rsvp.answering.index.gst.GSuffixTree"
+mvn exec:java -Dexec.mainClass="rsvp.answering.index.trie.TrieTree"

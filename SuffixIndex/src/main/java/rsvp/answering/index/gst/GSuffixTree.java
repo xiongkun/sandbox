@@ -861,11 +861,11 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        GSuffixTree tree = construct("data/poi2.txt");
+        GSuffixTree tree = construct("data/poi.txt");
 
-        tree.toBinaryFile("data/poi2");
+        tree.toBinaryFile("data/poi");
 
-        GSuffixTree tree2 = new GSuffixTree("data/poi2", true);
+        GSuffixTree tree2 = new GSuffixTree("data/poi", true);
 
         System.out.println("Nodes : " + GSuffixTree.nodes.size());
 

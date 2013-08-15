@@ -871,8 +871,8 @@ public class GSuffixTree
 
         System.out.println("Edges : " + GSuffixTree.edges.size());
 
-        System.out.println(tree.search("门"));
-        System.out.println(tree2.search("门"));
+//        System.out.println(tree.search("门"));
+//        System.out.println(tree2.search("门"));
 //        System.out.println(tree2.computeCount());
     }
 }

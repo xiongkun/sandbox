@@ -25,7 +25,6 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * A Generalized Suffix Tree, based on the Ukkonen's paper "On-line construction of suffix trees"
@@ -805,9 +804,8 @@ public class GSuffixTree
         nWriter.write(tree.nodes.size());
         for (int i = 0; i < tree.nodes.size(); i++)
         {
-            Collection<Integer> allIndices = tree.collectIndices(i);
-            nWriter.write(allIndices.size());
-            for (int idx : allIndices)
+            nWriter.write(tree.node(i).getNodeIndices().size());
+            for (int idx : tree.node(i).getNodeIndices())
             {
                 nWriter.write(idx);
             }
@@ -837,22 +835,22 @@ public class GSuffixTree
         }
     }
 
-    private Collection<Integer> collectIndices(int nodeIdx)
-    {
-        Set<Integer> ret = new HashSet<Integer>();
-        for (int num : node(nodeIdx).getNodeIndices())
-        {
-            ret.add(num);
-        }
-        for (int e : node(nodeIdx).getEdges().values())
-        {
-            for (int num : collectIndices(edge(e).getDest()))
-            {
-                ret.add(num);
-            }
-        }
-        return ret;
-    }
+//    private Collection<Integer> collectIndices(int nodeIdx)
+//    {
+//        Set<Integer> ret = new HashSet<Integer>();
+//        for (int num : node(nodeIdx).getNodeIndices())
+//        {
+//            ret.add(num);
+//        }
+//        for (int e : node(nodeIdx).getEdges().values())
+//        {
+//            for (int num : collectIndices(edge(e).getDest()))
+//            {
+//                ret.add(num);
+//            }
+//        }
+//        return ret;
+//    }
 
     /**
      * Adds the given <tt>index</tt> to the set of indexes associated with <tt>nodeIdx</tt>

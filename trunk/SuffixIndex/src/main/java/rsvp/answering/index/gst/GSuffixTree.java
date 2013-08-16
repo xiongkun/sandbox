@@ -736,7 +736,7 @@ public class GSuffixTree
      */
     private static void writetoBin(GSuffixTree tree, String path) throws IOException
     {
-        final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
+//        final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
         long t1 = System.currentTimeMillis();
         // tree.flush();
         String edgeFile = path + ".edges.gst.bin";
@@ -756,7 +756,7 @@ public class GSuffixTree
         nWriter.write(tree.nodes.size());
         for (int i = 0; i < tree.nodes.size(); i++)
         {
-            // HashSet<Integer> indices = tree.node(i).getNodeIndices();
+             HashSet<Integer> indices = tree.node(i).getNodeIndices();
             nWriter.write(indices.size());
             for (int idx : indices)
             {

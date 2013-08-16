@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
+import rsvp.answering.index.common.Utils;
+
 /**
  * A Generalized Suffix Tree, based on the Ukkonen's paper "On-line construction of suffix trees"
  * http://www.cs.helsinki.fi/u/ukkonen/SuffixT1withFigs.pdf
@@ -69,8 +71,6 @@ public class GSuffixTree
     public ArrayList<GSTNode> nodes = new ArrayList<GSTNode>();
 
     public ArrayList<GSTEdge> edges = new ArrayList<GSTEdge>();
-
-    public String[] docs = null;
 
     /**
      * The index of the last item that was added to the GST
@@ -136,7 +136,7 @@ public class GSuffixTree
                 int dataNum = nReader.read();
                 for (int j = 0; j < dataNum; j++)
                 {
-                    node.addIdx(nReader.read());
+                    node.addIndex(nReader.read());
                 }
                 int edgeMapNum = nReader.read();
                 for (int j = 0; j < edgeMapNum; j++)
@@ -286,42 +286,38 @@ public class GSuffixTree
         int currentNode = root;
         int currentEdge = -1;
 
-        for (int i = 0; i < word.length(); ++i)
+        for (int i = 0; i < word.length();)
         {
             char ch = word.charAt(i);
-            // follow the edge corresponding to this char
             currentEdge = node(currentNode).getEdge(ch);
             if (-1 == currentEdge)
             {
-                // there is no edge starting with this char
-                return null;
+                return result.toString();
             }
             else
             {
                 String label = edge(currentEdge).getLabel();
-                result.append(label);
-                int lenToMatch = Math.min(word.length() - i, label.length());
-                if (!word.regionMatches(i, label, 0, lenToMatch))
+                for (int j = 0; j < label.length(); j++)
                 {
-                    // the label on the edge does not correspond to the one in
-                    // the string to search
-                    return null;
+                    if (i >= word.length())
+                    {
+                        return result.toString();
+                    }
+                    else if (word.charAt(i) == label.charAt(j))
+                    {
+                        result.append(label.charAt(j));
+                        i++;
+                    }
+                    else
+                    {
+                        return result.toString();
+                    }
                 }
-
-                if (label.length() >= word.length() - i)
-                {
-                    return result.toString();
-                }
-                else
-                {
-                    // advance to next node
-                    currentNode = edge(currentEdge).getDest();
-                    i += lenToMatch - 1;
-                }
+                currentNode = edge(currentEdge).getDest();
             }
         }
 
-        return null;
+        return result.toString();
     }
 
     /**
@@ -785,8 +781,9 @@ public class GSuffixTree
      */
     private static void writetoBin(GSuffixTree tree, String path) throws IOException
     {
+        final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
         long t1 = System.currentTimeMillis();
-        tree.flush();
+        // tree.flush();
         String edgeFile = path + ".edges.gst.bin";
         String nodeFile = path + ".nodes.gst.bin";
         System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
@@ -804,8 +801,9 @@ public class GSuffixTree
         nWriter.write(tree.nodes.size());
         for (int i = 0; i < tree.nodes.size(); i++)
         {
-            nWriter.write(tree.node(i).getNodeIndices().size());
-            for (int idx : tree.node(i).getNodeIndices())
+            // HashSet<Integer> indices = tree.node(i).getNodeIndices();
+            nWriter.write(indices.size());
+            for (int idx : indices)
             {
                 nWriter.write(idx);
             }
@@ -835,22 +833,22 @@ public class GSuffixTree
         }
     }
 
-//    private Collection<Integer> collectIndices(int nodeIdx)
-//    {
-//        Set<Integer> ret = new HashSet<Integer>();
-//        for (int num : node(nodeIdx).getNodeIndices())
-//        {
-//            ret.add(num);
-//        }
-//        for (int e : node(nodeIdx).getEdges().values())
-//        {
-//            for (int num : collectIndices(edge(e).getDest()))
-//            {
-//                ret.add(num);
-//            }
-//        }
-//        return ret;
-//    }
+    // private Collection<Integer> collectIndices(int nodeIdx)
+    // {
+    // Set<Integer> ret = new HashSet<Integer>();
+    // for (int num : node(nodeIdx).getNodeIndices())
+    // {
+    // ret.add(num);
+    // }
+    // for (int e : node(nodeIdx).getEdges().values())
+    // {
+    // for (int num : collectIndices(edge(e).getDest()))
+    // {
+    // ret.add(num);
+    // }
+    // }
+    // return ret;
+    // }
 
     /**
      * Adds the given <tt>index</tt> to the set of indexes associated with <tt>nodeIdx</tt>
@@ -862,7 +860,7 @@ public class GSuffixTree
             return;
         }
 
-        node(nodeIdx).addIdx(index);
+        node(nodeIdx).addIndex(index);
 
         // add this reference to all the suffixes as well
         int iter = node(nodeIdx).suffix;
@@ -913,16 +911,15 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        buildTree("data/poi.txt");
+         GSuffixTree.buildTree("data/poi.txt");
 
         GSuffixTree tree = new GSuffixTree("data/poi.txt");
 
-        System.out.println("Nodes : " + tree.nodes.size());
+        System.out.println(Utils.findLongestSubstring(tree, "西直门城铁站附近"));
+        //
+        // System.out.println("Nodes : " + tree.nodes.size());
+        //
+        // System.out.println("Edges : " + tree.edges.size());
 
-        System.out.println("Edges : " + tree.edges.size());
-
-        // System.out.println(tree.search("门"));
-        // System.out.println(tree2.search("门"));
-        // System.out.println(tree2.computeCount());
     }
 }

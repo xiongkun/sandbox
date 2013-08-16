@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import rsvp.answering.index.gst.GSuffixTree;
+
 public class Utils
 {
 
@@ -69,7 +71,6 @@ public class Utils
         return ret;
     }
 
-
     public static HashMap<String, Integer> generateHashMap(String path)
     {
         HashMap<String, Integer> map = new HashMap<String, Integer>();
@@ -100,75 +101,84 @@ public class Utils
         return null;
     }
 
-//    @SuppressWarnings("unchecked")
-//    public static String toJSONString(GSTEdge edge)
-//    {
-//        JSONArray obj = new JSONArray();
-//        obj.add(edge.getLabel());
-//        obj.add(edge.getDest());
-//        return obj.toJSONString();
-//    }
-//
-//    public static GSTEdge toEdge(String s)
-//    {
-//        JSONArray obj = (JSONArray) JSONValue.parse(s);
-//        String label = (String) obj.get(0);
-//        int dest = (Integer) obj.get(1);
-//        GSTEdge e = new GSTEdge(label, dest);
-//        return e;
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    public static String toJSONString(GSTNode node)
-//    {
-//        JSONArray obj = new JSONArray();
-//        JSONArray data = new JSONArray();
-//        for (int ind : node.getData())
-//        {
-//            data.add(ind);
-//        }
-//        obj.add(data);
-//        JSONArray keys = new JSONArray();
-//        JSONArray values = new JSONArray();
-//        for (char key : node.getEdges().keySet())
-//        {
-//            keys.add(key);
-//            values.add(node.getEdges().get(key));
-//        }
-//        obj.add(keys);
-//        obj.add(values);
-//        return obj.toJSONString();
-//    }
-//
-//    public static GSTNode toNode(String s)
-//    {
-//        GSTNode node = new GSTNode();
-//        JSONArray obj = (JSONArray) JSONValue.parse(s);
-//
-//        JSONArray data = (JSONArray) obj.get(0);
-//        JSONArray keys = (JSONArray) obj.get(1);
-//        JSONArray values = (JSONArray) obj.get(2);
-//        for (Object idx : data)
-//        {
-//            node.addIdx((Integer) idx);
-//        }
-//        for (int i = 0; i < keys.size(); i++)
-//        {
-//            node.addEdge((Character) keys.get(i), (Integer) values.get(i));
-//        }
-//        return node;
-//    }
+    // @SuppressWarnings("unchecked")
+    // public static String toJSONString(GSTEdge edge)
+    // {
+    // JSONArray obj = new JSONArray();
+    // obj.add(edge.getLabel());
+    // obj.add(edge.getDest());
+    // return obj.toJSONString();
+    // }
+    //
+    // public static GSTEdge toEdge(String s)
+    // {
+    // JSONArray obj = (JSONArray) JSONValue.parse(s);
+    // String label = (String) obj.get(0);
+    // int dest = (Integer) obj.get(1);
+    // GSTEdge e = new GSTEdge(label, dest);
+    // return e;
+    // }
+    //
+    // @SuppressWarnings("unchecked")
+    // public static String toJSONString(GSTNode node)
+    // {
+    // JSONArray obj = new JSONArray();
+    // JSONArray data = new JSONArray();
+    // for (int ind : node.getData())
+    // {
+    // data.add(ind);
+    // }
+    // obj.add(data);
+    // JSONArray keys = new JSONArray();
+    // JSONArray values = new JSONArray();
+    // for (char key : node.getEdges().keySet())
+    // {
+    // keys.add(key);
+    // values.add(node.getEdges().get(key));
+    // }
+    // obj.add(keys);
+    // obj.add(values);
+    // return obj.toJSONString();
+    // }
+    //
+    // public static GSTNode toNode(String s)
+    // {
+    // GSTNode node = new GSTNode();
+    // JSONArray obj = (JSONArray) JSONValue.parse(s);
+    //
+    // JSONArray data = (JSONArray) obj.get(0);
+    // JSONArray keys = (JSONArray) obj.get(1);
+    // JSONArray values = (JSONArray) obj.get(2);
+    // for (Object idx : data)
+    // {
+    // node.addIdx((Integer) idx);
+    // }
+    // for (int i = 0; i < keys.size(); i++)
+    // {
+    // node.addEdge((Character) keys.get(i), (Integer) values.get(i));
+    // }
+    // return node;
+    // }
+
+    public static String findLongestSubstring(GSuffixTree tree, String word)
+    {
+        String longestSubstr = "";
+        for (int i = 0; i < word.length() - 1; i++)
+        {
+            String suffix = word.substring(i);
+            String matched = tree.match(suffix);
+            if (matched.length() > longestSubstr.length())
+            {
+                longestSubstr = matched;
+            }
+        }
+        return longestSubstr;
+    }
 
     public static void main(String[] args)
     {
-        // GSuffixTree in = new GSuffixTree();
-        // String[] words = new String[] { "白日依山尽", "飞流直下三千尺", "两只黄鹂鸣翠柳" };
-        // for (int i = 0; i < words.length; ++i) {
-        // in.put(words[i], i);
-        // }
-        //
-        // System.out.println(in.search("飞流"));
-        // System.out.println(in.search("两"));
+        GSuffixTree.buildTree("data/poi2.txt");
 
+        GSuffixTree tree = new GSuffixTree("data/poi2.txt");
     }
 }

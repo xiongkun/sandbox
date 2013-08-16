@@ -251,7 +251,7 @@ public class TrieTree
     private int getNode(String word)
     {
         int nodeIdx = root;
-        for (int j = 0; j < word.length(); j++)
+        for (int j = 0; j < word.length();)
         {
             if (nodeIdx == -1)
             {

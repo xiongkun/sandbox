@@ -120,15 +120,8 @@ class GSTNode
         this.suffix = suffix;
     }
 
-    public void addIdx(int index)
+    public void addIndex(int index)
     {
-        // if (lastIdx == data.length)
-        // {
-        // int[] copy = new int[data.length + INCREMENT];
-        // System.arraycopy(data, 0, copy, 0, data.length);
-        // data = copy;
-        // }
-        // data[lastIdx++] = index;
         indices.add(index);
     }
 

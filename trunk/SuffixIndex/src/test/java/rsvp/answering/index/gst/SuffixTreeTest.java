@@ -15,14 +15,13 @@
  */
 package rsvp.answering.index.gst;
 
+import static rsvp.answering.index.common.Utils.getSubstrings;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 
-import rsvp.answering.index.gst.GSuffixTree;
-import rsvp.answering.index.gst.GSTNode;
 import junit.framework.TestCase;
-import static rsvp.answering.index.common.Utils.getSubstrings;
 
 public class SuffixTreeTest extends TestCase {
 
@@ -31,26 +30,25 @@ public class SuffixTreeTest extends TestCase {
 
         String word = "cacao";
         in.put(word, 0);
-        in.flush();
 
         /* test that every substring is contained within the tree */
         for (String s : getSubstrings(word)) {
-            assertTrue(in.search(s).contains(0));
+            assertTrue(in.flushAndSearch(s).contains(0));
         }
-        assertNull(in.search("caco"));
-        assertNull(in.search("cacaoo"));
-        assertNull(in.search("ccacao"));
+        assertNull(in.flushAndSearch("caco"));
+        assertNull(in.flushAndSearch("cacaoo"));
+        assertNull(in.flushAndSearch("ccacao"));
 
         in = new GSuffixTree();
         word = "bookkeeper";
         in.put(word, 0);
-        in.flush();
+        
         for (String s : getSubstrings(word)) {
-            assertTrue(in.search(s).contains(0));
+            assertTrue(in.flushAndSearch(s).contains(0));
         }
-        assertNull(in.search("books"));
-        assertNull(in.search("boke"));
-        assertNull(in.search("ookepr"));
+        assertNull(in.flushAndSearch("books"));
+        assertNull(in.flushAndSearch("boke"));
+        assertNull(in.flushAndSearch("ookepr"));
     }
 
     public void testWeirdword() {
@@ -58,11 +56,10 @@ public class SuffixTreeTest extends TestCase {
 
         String word = "cacacato";
         in.put(word, 0);
-        in.flush();
 
         /* test that every substring is contained within the tree */
         for (String s : getSubstrings(word)) {
-            assertTrue(in.search(s).contains(0));
+            assertTrue(in.flushAndSearch(s).contains(0));
         }
     }
 
@@ -72,11 +69,10 @@ public class SuffixTreeTest extends TestCase {
         String word = "cacao";
         in.put(word, 0);
         in.put(word, 1);
-        in.flush();
 
         for (String s : getSubstrings(word)) {
-            assertTrue(in.search(s).contains(0));
-            assertTrue(in.search(s).contains(1));
+            assertTrue(in.flushAndSearch(s).contains(0));
+            assertTrue(in.flushAndSearch(s).contains(1));
         }
     }
 
@@ -85,10 +81,9 @@ public class SuffixTreeTest extends TestCase {
         String[] words = new String[] {"banana", "bano", "ba"};
         for (int i = 0; i < words.length; ++i) {
             in.put(words[i], i);
-            in.flush();
-            in.print();
+            
             for (String s : getSubstrings(words[i])) {
-                Collection<Integer> result = in.search(s);
+                Collection<Integer> result = in.flushAndSearch(s);
                 assertNotNull("result null for string " + s + " after adding " + words[i], result);
                 assertTrue("substring " + s + " not found after adding " + words[i], result.contains(i));
             }
@@ -98,16 +93,16 @@ public class SuffixTreeTest extends TestCase {
         // verify post-addition
         for (int i = 0; i < words.length; ++i) {
             for (String s : getSubstrings(words[i])) {
-                assertTrue(in.search(s).contains(i));
+                assertTrue(in.flushAndSearch(s).contains(i));
             }
         }
 
         // add again, to see if it's stable
         for (int i = 0; i < words.length; ++i) {
             in.put(words[i], i + words.length);
-            in.flush();
+
             for (String s : getSubstrings(words[i])) {
-                assertTrue(in.search(s).contains(i + words.length));
+                assertTrue(in.flushAndSearch(s).contains(i + words.length));
             }
         }
 
@@ -118,9 +113,9 @@ public class SuffixTreeTest extends TestCase {
         String[] words = new String[] {"cacaor" , "caricato", "cacato", "cacata", "caricata", "cacao", "banana"};
         for (int i = 0; i < words.length; ++i) {
             in.put(words[i], i);
-            in.flush();
+
             for (String s : getSubstrings(words[i])) {
-                Collection<Integer> result = in.search(s);
+                Collection<Integer> result = in.flushAndSearch(s);
                 assertNotNull("result null for string " + s + " after adding " + words[i], result);
                 assertTrue("substring " + s + " not found after adding " + words[i], result.contains(i));
             }
@@ -128,7 +123,7 @@ public class SuffixTreeTest extends TestCase {
         // verify post-addition
         for (int i = 0; i < words.length; ++i) {
             for (String s : getSubstrings(words[i])) {
-                Collection<Integer> result = in.search(s);
+                Collection<Integer> result = in.flushAndSearch(s);
                 assertNotNull("result null for string " + s + " after adding " + words[i], result);
                 assertTrue("substring " + s + " not found after adding " + words[i], result.contains(i));
             }
@@ -137,16 +132,16 @@ public class SuffixTreeTest extends TestCase {
         // add again, to see if it's stable
         for (int i = 0; i < words.length; ++i) {
             in.put(words[i], i + words.length);
-            in.flush();
+
             for (String s : getSubstrings(words[i])) {
-                assertTrue(in.search(s).contains(i + words.length));
+                assertTrue(in.flushAndSearch(s).contains(i + words.length));
             }
         }
         
 //        in.computeCount();
 //        testResultsCount(in.getRoot());
 
-        assertNull(in.search("aoca"));
+        assertNull(in.flushAndSearch("aoca"));
     }
 
     public void testSampleAddition() {
@@ -181,9 +176,9 @@ public class SuffixTreeTest extends TestCase {
             "bethesda"};
         for (int i = 0; i < words.length; ++i) {
             in.put(words[i], i);
-            in.flush();
+            
             for (String s : getSubstrings(words[i])) {
-                Collection<Integer> result = in.search(s);
+                Collection<Integer> result = in.flushAndSearch(s);
                 assertNotNull("result null for string " + s + " after adding " + words[i], result);
                 assertTrue("substring " + s + " not found after adding " + words[i], result.contains(i));
             }
@@ -193,23 +188,23 @@ public class SuffixTreeTest extends TestCase {
         // verify post-addition
         for (int i = 0; i < words.length; ++i) {
             for (String s : getSubstrings(words[i])) {
-                assertTrue(in.search(s).contains(i));
+                assertTrue(in.flushAndSearch(s).contains(i));
             }
         }
 
         // add again, to see if it's stable
         for (int i = 0; i < words.length; ++i) {
             in.put(words[i], i + words.length);
-
+            
             for (String s : getSubstrings(words[i])) {
-                assertTrue(in.search(s).contains(i + words.length));
+                assertTrue(in.flushAndSearch(s).contains(i + words.length));
             }
         }
 
 //        in.computeCount();
 //        testResultsCount(in.getRoot());
 
-        assertNull(in.search("aoca"));
+        assertNull(in.flushAndSearch("aoca"));
     }
 
 //    private void testResultsCount(GSTNode n) {

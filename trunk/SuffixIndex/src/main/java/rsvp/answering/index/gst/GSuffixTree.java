@@ -24,7 +24,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -95,11 +94,21 @@ public class GSuffixTree
         activeLeaf = root;
     }
 
+    /**
+     * This is a optimal GST (flushed). It does not require flush anymore.
+     * 
+     * @param path
+     */
     public GSuffixTree(String path)
     {
-            loadFromBinaryFile(path);
+        loadFromBinaryFile(path);
     }
 
+    /**
+     * Load gst from bin files which is flushed
+     * 
+     * @param path
+     */
     private void loadFromBinaryFile(String path)
     {
         try
@@ -149,146 +158,68 @@ public class GSuffixTree
         }
     }
 
-    public void flush(Collection<Integer> indices, int nodeIdx)
+    /**
+     * Recursively update all nodes of a sub-tree below nodeIdx : merge indices for a node from one's sub-tree children
+     * 
+     * @param nodeIdx
+     * @return
+     */
+    private HashSet<Integer> updateIndices(int nodeIdx)
     {
         if (node(nodeIdx).getEdges().isEmpty())
         {
-            indices.addAll(node(nodeIdx).getNodeIndices());
-
+            return node(nodeIdx).getNodeIndices();
         }
         else
         {
-            for (int e : node(nodeIdx).getEdges().values())
+            for (int edge : node(nodeIdx).getEdges().values())
             {
-                flush(indices, edge(e).getDest());
+                node(nodeIdx).addIndices(updateIndices(edge(edge).getDest()));
             }
+            return node(nodeIdx).getNodeIndices();
         }
     }
 
+    /**
+     * Update indices of all nodes by adding all indices of their children
+     * 
+     */
     public void flush()
     {
-        int nodeIdx = root;
-        Set<Integer> ret = new HashSet<Integer>();
-        for (int num : node(nodeIdx).getNodeIndices())
-        {
-            ret.add(num);
-            if (ret.size() == numElements)
-            {
-                return ret;
-            }
-        }
-        // need to get more matches from child nodes. This is what may waste time
-        int missingItems = numElements == -1 ? -1 : numElements - ret.size();
-        for (int e : node(nodeIdx).getEdges().values())
-        {
-            if (-1 == numElements || ret.size() < numElements)
-            {
-                for (int num : node(edge(e).getDest()).getNodeIndices(missingItems))
-                {
-                    ret.add(num);
-                    if (ret.size() == numElements)
-                    {
-                        return ret;
-                    }
-                }
-                missingItems = numElements == -1 ? -1 : numElements - ret.size();
-            }
-        }
-        return ret;
+        updateIndices(root);
     }
 
-    // /**
-    // * Indices of each node contains all
-    // *
-    // * @param path
-    // */
-    // private void toStringFile(String path)
-    // {
-    // try
-    // {
-    // long t1 = System.currentTimeMillis();
-    // System.out.print("Writing...");
-    // BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst"),
-    // "utf-8"));
-    // for (GSTEdge edge : edges)
-    // {
-    // eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
-    // }
-    // eWriter.close();
-    //
-    // BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst"),
-    // "utf-8"));
-    // for (int i = 0; i < nodes.size(); i++)
-    // {
-    // for (int idx : collectIndices(i))
-    // {
-    // nWriter.append(idx + "\t");
-    // }
-    // nWriter.append("\n");
-    //
-    // for (char ch : node(i).getEdges().keySet())
-    // {
-    // nWriter.append(ch + "\t").append(node(i).getEdges().get(ch) + "\t");
-    // }
-    // nWriter.append("\n");
-    // }
-    // nWriter.close();
-    // long t2 = System.currentTimeMillis();
-    // System.out.println("Done : " + (t2 - t1) + "ms");
-    // }
-    // catch (Exception ex)
-    // {
-    // ex.printStackTrace();
-    // }
-    // }
-
     /**
-     * Searches for the given word within the GST.
+     * Require flush before invoking search unless a gst is generate from bin file
      * 
-     * Returns all the indexes for which the key contains the <tt>word</tt> that was supplied as input.
-     * 
-     * @param word the key to search for
-     * @return the collection of indexes associated with the input <tt>word</tt>
+     * @param word
+     * @return
      */
     public Collection<Integer> search(String word)
-    {
-        return search(word, -1);
-    }
-
-    /**
-     * Searches for the given word within the GST and returns at most the given number of matches.
-     * 
-     * @param word the key to search for
-     * @param results the max number of results to return
-     * @return at most <tt>results</tt> values for the given word
-     */
-    public Collection<Integer> search(String word, int results)
     {
         GSTNode tmpNode = searchNode(word);
         if (tmpNode == null)
         {
             return null;
         }
-        return tmpNode.getNodeIndices(results);
+        return tmpNode.getNodeIndices();
     }
 
     /**
-     * Searches for the given word within the GST and returns at most the given number of matches.
+     * Flush and Search
      * 
-     * @param word the key to search for
-     * @param to the max number of results to return
-     * @return at most <tt>results</tt> values for the given word
-     * @see GSuffixTree#ResultInfo
+     * @param word
+     * @return
      */
-    public ResultInfo searchWithCount(String word, int to)
+    protected Collection<Integer> flushAndSearch(String word)
     {
+        flush();
         GSTNode tmpNode = searchNode(word);
         if (tmpNode == null)
         {
-            return new ResultInfo(Collections.<Integer> emptyList(), 0);
+            return null;
         }
-
-        return new ResultInfo(tmpNode.getNodeIndices(to), tmpNode.getResultCount());
+        return tmpNode.getNodeIndices();
     }
 
     /**
@@ -848,7 +779,7 @@ public class GSuffixTree
     }
 
     /**
-     * Indices of each node contains all
+     * Flush and write all nodes and edges to files
      * 
      * @param path
      * @throws IOException
@@ -856,6 +787,7 @@ public class GSuffixTree
     private static void writetoBin(GSuffixTree tree, String path) throws IOException
     {
         long t1 = System.currentTimeMillis();
+        tree.flush();
         String edgeFile = path + ".edges.gst.bin";
         String nodeFile = path + ".nodes.gst.bin";
         System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
@@ -905,51 +837,18 @@ public class GSuffixTree
         }
     }
 
-    /**
-     * Returns all the indexes associated to this node and its children.
-     * 
-     * @return all the indexes associated to this node and its children
-     */
-    public Collection<Integer> collectIndices(int nodeIdx)
-    {
-        return collectIndices(nodeIdx, -1);
-    }
-
-    /**
-     * Returns the first <tt>numElements</tt> elements from the ones associated to this node.
-     * 
-     * Gets data from the payload of both this node and its children, the string representation of the path to this node
-     * is a substring of the one of the children nodes.
-     * 
-     * @param numElements the number of results to return. Use -1 to get all
-     * @return the first <tt>numElements</tt> associated to this node and children
-     */
-    Collection<Integer> collectIndices(int nodeIdx, int numElements)
+    private Collection<Integer> collectIndices(int nodeIdx)
     {
         Set<Integer> ret = new HashSet<Integer>();
         for (int num : node(nodeIdx).getNodeIndices())
         {
             ret.add(num);
-            if (ret.size() == numElements)
-            {
-                return ret;
-            }
         }
-        // need to get more matches from child nodes. This is what may waste time
-        int missingItems = numElements == -1 ? -1 : numElements - ret.size();
         for (int e : node(nodeIdx).getEdges().values())
         {
-            if (-1 == numElements || ret.size() < numElements)
+            for (int num : collectIndices(edge(e).getDest()))
             {
-                for (int num : node(edge(e).getDest()).getNodeIndices(missingItems))
-                {
-                    ret.add(num);
-                    if (ret.size() == numElements)
-                    {
-                        return ret;
-                    }
-                }
-                missingItems = numElements == -1 ? -1 : numElements - ret.size();
+                ret.add(num);
             }
         }
         return ret;
@@ -1018,7 +917,7 @@ public class GSuffixTree
 
         buildTree("data/poi.txt");
 
-        GSuffixTree tree = new GSuffixTree("data/poi.txt", true);
+        GSuffixTree tree = new GSuffixTree("data/poi.txt");
 
         System.out.println("Nodes : " + tree.nodes.size());
 

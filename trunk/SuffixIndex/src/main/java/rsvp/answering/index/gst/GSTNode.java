@@ -18,7 +18,6 @@ package rsvp.answering.index.gst;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
 
 /**
  * Represents a node of the generalized suffix tree graph
@@ -38,14 +37,11 @@ class GSTNode
      * Originally it was a List<Integer> but it took too much memory, changing it to int[] take less memory because
      * indexes are stored using native types.
      */
-    // private int[] data;
-
     private HashSet<Integer> indices;
 
     /**
      * The set of edges starting from this node
      */
-    // private EdgeBag edges;
 
     private HashMap<Character, Integer> edges;
 
@@ -60,39 +56,24 @@ class GSTNode
      */
     GSTNode()
     {
-        // edges = new EdgeBag();
         edges = new HashMap<Character, Integer>();
         suffix = -1;
-        // data = new int[START_SIZE];
         indices = new HashSet<Integer>();
-    }
-
-    public Collection<Integer> getNodeIndices()
-    {
-        return indices;
     }
 
     public void setNodeIndices(Collection<Integer> all)
     {
-        indices.clear();
-        indices.addAll(all);
+        this.indices.clear();
+        this.indices.addAll(all);
+    }
+    
+    public void addIndices(Collection<Integer> indices)
+    {
+        this.indices.addAll(indices);
     }
 
-    public Collection<Integer> getNodeIndices(int numElements)
+    public HashSet<Integer> getNodeIndices()
     {
-        if (numElements < 0 || indices.size() <= numElements)
-        {
-            return indices;
-        }
-        Set<Integer> ret = new HashSet<Integer>();
-        for (int num : indices)
-        {
-            ret.add(num);
-            if (ret.size() == numElements)
-            {
-                return ret;
-            }
-        }
         return indices;
     }
 
@@ -123,11 +104,6 @@ class GSTNode
         }
         return intg.intValue();
     }
-
-    // EdgeBag getEdges()
-    // {
-    // return edges;
-    // }
 
     HashMap<Character, Integer> getEdges()
     {

@@ -664,7 +664,7 @@ public class GSuffixTree
         {
             System.out.print("Loading...");
             long t1 = System.currentTimeMillis();
-    
+
             BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst.bin"), "utf-8"));
             int edgeNum = eReader.read();
             for (int i = 0; i < edgeNum; i++)
@@ -676,9 +676,9 @@ public class GSuffixTree
                 edges.add(new GSTEdge(new String(lableChar), dest));
             }
             eReader.close();
-    
+
             BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst.bin"), "utf-8"));
-    
+
             int nodeNum = nReader.read();
             for (int i = 0; i < nodeNum; i++)
             {
@@ -696,7 +696,7 @@ public class GSuffixTree
                 }
                 nodes.add(node);
             }
-    
+
             nReader.close();
             long t2 = System.currentTimeMillis();
             System.out.println("Done : " + (t2 - t1) + "ms");
@@ -736,9 +736,9 @@ public class GSuffixTree
      */
     private static void writetoBin(GSuffixTree tree, String path) throws IOException
     {
-//        final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
+        // final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
         long t1 = System.currentTimeMillis();
-        // tree.flush();
+        tree.flush();
         String edgeFile = path + ".edges.gst.bin";
         String nodeFile = path + ".nodes.gst.bin";
         System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
@@ -756,7 +756,7 @@ public class GSuffixTree
         nWriter.write(tree.nodes.size());
         for (int i = 0; i < tree.nodes.size(); i++)
         {
-             HashSet<Integer> indices = tree.node(i).getNodeIndices();
+            HashSet<Integer> indices = tree.node(i).getNodeIndices();
             nWriter.write(indices.size());
             for (int idx : indices)
             {
@@ -866,7 +866,7 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-         GSuffixTree.buildTree("data/poi.txt");
+        GSuffixTree.buildTree("data/poi.txt");
 
         GSuffixTree tree = new GSuffixTree("data/poi.txt");
 

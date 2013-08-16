@@ -100,61 +100,7 @@ public class GSuffixTree
      */
     public GSuffixTree(String path)
     {
-        loadFromBinaryFile(path);
-    }
-
-    /**
-     * Load gst from bin files which is flushed
-     * 
-     * @param path
-     */
-    private void loadFromBinaryFile(String path)
-    {
-        try
-        {
-            System.out.print("Loading...");
-            long t1 = System.currentTimeMillis();
-
-            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst.bin"), "utf-8"));
-            int edgeNum = eReader.read();
-            for (int i = 0; i < edgeNum; i++)
-            {
-                int lableCharNum = eReader.read();
-                char[] lableChar = new char[lableCharNum];
-                eReader.read(lableChar);
-                int dest = eReader.read();
-                edges.add(new GSTEdge(new String(lableChar), dest));
-            }
-            eReader.close();
-
-            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst.bin"), "utf-8"));
-
-            int nodeNum = nReader.read();
-            for (int i = 0; i < nodeNum; i++)
-            {
-                GSTNode node = new GSTNode();
-                int dataNum = nReader.read();
-                for (int j = 0; j < dataNum; j++)
-                {
-                    node.addIndex(nReader.read());
-                }
-                int edgeMapNum = nReader.read();
-                for (int j = 0; j < edgeMapNum; j++)
-                {
-                    char ch = (char) nReader.read();
-                    node.addEdge(ch, nReader.read());
-                }
-                nodes.add(node);
-            }
-
-            nReader.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+        constructFromBin(path);
     }
 
     /**
@@ -707,50 +653,59 @@ public class GSuffixTree
         }
     }
 
-    // /**
-    // * Indices of each node contains all
-    // *
-    // * @param path
-    // */
-    // private void toStringFile(String path)
-    // {
-    // try
-    // {
-    // long t1 = System.currentTimeMillis();
-    // System.out.print("Writing...");
-    // BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst"),
-    // "utf-8"));
-    // for (GSTEdge edge : edges)
-    // {
-    // eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
-    // }
-    // eWriter.close();
-    //
-    // BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst"),
-    // "utf-8"));
-    // for (int i = 0; i < nodes.size(); i++)
-    // {
-    // for (int idx : collectIndices(i))
-    // {
-    // nWriter.append(idx + "\t");
-    // }
-    // nWriter.append("\n");
-    //
-    // for (char ch : node(i).getEdges().keySet())
-    // {
-    // nWriter.append(ch + "\t").append(node(i).getEdges().get(ch) + "\t");
-    // }
-    // nWriter.append("\n");
-    // }
-    // nWriter.close();
-    // long t2 = System.currentTimeMillis();
-    // System.out.println("Done : " + (t2 - t1) + "ms");
-    // }
-    // catch (Exception ex)
-    // {
-    // ex.printStackTrace();
-    // }
-    // }
+    /**
+     * Load gst from bin files which is flushed
+     * 
+     * @param path
+     */
+    private void constructFromBin(String path)
+    {
+        try
+        {
+            System.out.print("Loading...");
+            long t1 = System.currentTimeMillis();
+    
+            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst.bin"), "utf-8"));
+            int edgeNum = eReader.read();
+            for (int i = 0; i < edgeNum; i++)
+            {
+                int lableCharNum = eReader.read();
+                char[] lableChar = new char[lableCharNum];
+                eReader.read(lableChar);
+                int dest = eReader.read();
+                edges.add(new GSTEdge(new String(lableChar), dest));
+            }
+            eReader.close();
+    
+            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst.bin"), "utf-8"));
+    
+            int nodeNum = nReader.read();
+            for (int i = 0; i < nodeNum; i++)
+            {
+                GSTNode node = new GSTNode();
+                int dataNum = nReader.read();
+                for (int j = 0; j < dataNum; j++)
+                {
+                    node.addIndex(nReader.read());
+                }
+                int edgeMapNum = nReader.read();
+                for (int j = 0; j < edgeMapNum; j++)
+                {
+                    char ch = (char) nReader.read();
+                    node.addEdge(ch, nReader.read());
+                }
+                nodes.add(node);
+            }
+    
+            nReader.close();
+            long t2 = System.currentTimeMillis();
+            System.out.println("Done : " + (t2 - t1) + "ms");
+        }
+        catch (Exception ex)
+        {
+            ex.printStackTrace();
+        }
+    }
 
     private static GSuffixTree loadDictFile(String file) throws IllegalStateException, IOException
     {

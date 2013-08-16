@@ -25,8 +25,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import rsvp.answering.index.gst.GSuffixTree;
-
 public class Utils
 {
 
@@ -171,18 +169,6 @@ public class Utils
         //
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
-
-        GSuffixTree tree = GSuffixTree.construct("data/poi.txt");
-
-        tree.toStringFile("data/poi");
-
-        GSuffixTree tree2 = new GSuffixTree("data/poi");
-
-        System.out.println("Nodes : " + GSuffixTree.nodes.size());
-
-        System.out.println("Edges : " + GSuffixTree.edges.size());
-
-        System.out.println(tree2.computeCount());
 
     }
 }

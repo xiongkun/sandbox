@@ -18,15 +18,15 @@ package rsvp.answering.index.gst;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Generalized Suffix Tree, based on the Ukkonen's paper "On-line construction of suffix trees"
@@ -68,9 +68,11 @@ import java.util.Collections;
 public class GSuffixTree
 {
 
-    public static ArrayList<GSTNode> nodes = new ArrayList<GSTNode>();
+    public ArrayList<GSTNode> nodes = new ArrayList<GSTNode>();
 
-    public static ArrayList<GSTEdge> edges = new ArrayList<GSTEdge>();
+    public ArrayList<GSTEdge> edges = new ArrayList<GSTEdge>();
+
+    public String[] docs = null;
 
     /**
      * The index of the last item that was added to the GST
@@ -95,51 +97,10 @@ public class GSuffixTree
 
     public GSuffixTree(String path)
     {
-        try
-        {
-            System.out.print("Loading...");
-            long t1 = System.currentTimeMillis();
-
-            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst"), "utf-8"));
-            String line = null;
-            while ((line = eReader.readLine()) != null)
-            {
-                // edges.add(Utils.toEdge(line));
-                String[] iss = line.split("[\t]");
-                edges.add(new GSTEdge(iss[0], Integer.parseInt(iss[1])));
-            }
-            eReader.close();
-
-            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst"), "utf-8"));
-            line = null;
-            while ((line = nReader.readLine()) != null)
-            {
-                // nodes.add(Utils.toNode(line));
-                GSTNode node = new GSTNode();
-                String[] iss = line.split("[\t]");
-                for (String is : iss)
-                {
-                    node.addIdx(Integer.parseInt(is));
-                }
-                line = nReader.readLine();
-                iss = line.split("[\t]");
-                for (int i = 0; i < iss.length - 1; i = i + 2)
-                {
-                    node.addEdge(iss[0].charAt(i), Integer.parseInt(iss[i + 1]));
-                }
-                nodes.add(node);
-            }
-            nReader.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
+            loadFromBinaryFile(path);
     }
 
-    public GSuffixTree(String path, boolean fromBinary)
+    private void loadFromBinaryFile(String path)
     {
         try
         {
@@ -188,85 +149,98 @@ public class GSuffixTree
         }
     }
 
-    public void toStringFile(String path)
+    public void flush(Collection<Integer> indices, int nodeIdx)
     {
-        try
+        if (node(nodeIdx).getEdges().isEmpty())
         {
-            long t1 = System.currentTimeMillis();
-            System.out.print("Writing...");
-            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst"), "utf-8"));
-            for (GSTEdge edge : edges)
-            {
-                eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
-            }
-            eWriter.close();
+            indices.addAll(node(nodeIdx).getNodeIndices());
 
-            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst"), "utf-8"));
-            for (GSTNode node : nodes)
-            {
-                for (int idx : node.getData())
-                {
-                    nWriter.append(idx + "\t");
-                }
-                nWriter.append("\n");
-
-                for (char ch : node.getEdges().keySet())
-                {
-                    nWriter.append(ch + "\t").append(node.getEdges().get(ch) + "\t");
-                }
-                nWriter.append("\n");
-            }
-            nWriter.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
         }
-        catch (Exception ex)
+        else
         {
-            ex.printStackTrace();
+            for (int e : node(nodeIdx).getEdges().values())
+            {
+                flush(indices, edge(e).getDest());
+            }
         }
     }
 
-    public void toBinaryFile(String path)
+    public void flush()
     {
-        try
+        int nodeIdx = root;
+        Set<Integer> ret = new HashSet<Integer>();
+        for (int num : node(nodeIdx).getNodeIndices())
         {
-            long t1 = System.currentTimeMillis();
-            System.out.print("Writing...");
-            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst.bin"), "utf-8"));
-            eWriter.write(edges.size());
-            for (GSTEdge edge : edges)
+            ret.add(num);
+            if (ret.size() == numElements)
             {
-                eWriter.write(edge.getLabel().length());
-                eWriter.write(edge.getLabel().toCharArray());
-                eWriter.write(edge.getDest());
+                return ret;
             }
-            eWriter.close();
-
-            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst.bin"), "utf-8"));
-            nWriter.write(nodes.size());
-            for (GSTNode node : nodes)
-            {
-                nWriter.write(node.getData().size());
-                for (int idx : node.getData())
-                {
-                    nWriter.write(idx);
-                }
-                nWriter.write(node.getEdges().size());
-                for (char ch : node.getEdges().keySet())
-                {
-                    nWriter.write(ch);
-                    nWriter.write(node.getEdges().get(ch));
-                }
-            }
-            nWriter.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
         }
-        catch (Exception ex)
+        // need to get more matches from child nodes. This is what may waste time
+        int missingItems = numElements == -1 ? -1 : numElements - ret.size();
+        for (int e : node(nodeIdx).getEdges().values())
         {
-            ex.printStackTrace();
+            if (-1 == numElements || ret.size() < numElements)
+            {
+                for (int num : node(edge(e).getDest()).getNodeIndices(missingItems))
+                {
+                    ret.add(num);
+                    if (ret.size() == numElements)
+                    {
+                        return ret;
+                    }
+                }
+                missingItems = numElements == -1 ? -1 : numElements - ret.size();
+            }
         }
+        return ret;
     }
+
+    // /**
+    // * Indices of each node contains all
+    // *
+    // * @param path
+    // */
+    // private void toStringFile(String path)
+    // {
+    // try
+    // {
+    // long t1 = System.currentTimeMillis();
+    // System.out.print("Writing...");
+    // BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst"),
+    // "utf-8"));
+    // for (GSTEdge edge : edges)
+    // {
+    // eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
+    // }
+    // eWriter.close();
+    //
+    // BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst"),
+    // "utf-8"));
+    // for (int i = 0; i < nodes.size(); i++)
+    // {
+    // for (int idx : collectIndices(i))
+    // {
+    // nWriter.append(idx + "\t");
+    // }
+    // nWriter.append("\n");
+    //
+    // for (char ch : node(i).getEdges().keySet())
+    // {
+    // nWriter.append(ch + "\t").append(node(i).getEdges().get(ch) + "\t");
+    // }
+    // nWriter.append("\n");
+    // }
+    // nWriter.close();
+    // long t2 = System.currentTimeMillis();
+    // System.out.println("Done : " + (t2 - t1) + "ms");
+    // }
+    // catch (Exception ex)
+    // {
+    // ex.printStackTrace();
+    // }
+    // }
 
     /**
      * Searches for the given word within the GST.
@@ -295,7 +269,7 @@ public class GSuffixTree
         {
             return null;
         }
-        return tmpNode.getData(results);
+        return tmpNode.getNodeIndices(results);
     }
 
     /**
@@ -314,7 +288,7 @@ public class GSuffixTree
             return new ResultInfo(Collections.<Integer> emptyList(), 0);
         }
 
-        return new ResultInfo(tmpNode.getData(to), tmpNode.getResultCount());
+        return new ResultInfo(tmpNode.getNodeIndices(to), tmpNode.getResultCount());
     }
 
     /**
@@ -545,7 +519,7 @@ public class GSuffixTree
                 if (remainder.equals(edge(e).getLabel()))
                 {
                     // update payload of destination node
-                    node(edge(e).getDest()).addRef(value);
+                    addIndex(edge(e).getDest(), value);
                     return new Pair<Boolean, Integer>(true, s);
                 }
                 else if (remainder.startsWith(edge(e).getLabel()))
@@ -710,32 +684,31 @@ public class GSuffixTree
         return new Pair<Integer, String>(s, tempstr);
     }
 
-    private static int createNode()
+    private int createNode()
     {
         nodes.add(new GSTNode());
         return nodes.size() - 1;
     }
 
-    private static int createNode(int ref)
+    private int createNode(int index)
     {
-        GSTNode n = new GSTNode();
-        n.addRef(ref);
-        nodes.add(n);
+        int newNode = createNode();
+        addIndex(newNode, index);
         return nodes.size() - 1;
     }
 
-    protected static int createEdge(String rest, int leaf)
+    protected int createEdge(String rest, int leaf)
     {
         edges.add(new GSTEdge(rest, leaf));
         return edges.size() - 1;
     }
 
-    protected static GSTNode node(int index)
+    protected GSTNode node(int index)
     {
         return nodes.get(index);
     }
 
-    protected static GSTEdge edge(int index)
+    protected GSTEdge edge(int index)
     {
         return edges.get(index);
     }
@@ -752,11 +725,6 @@ public class GSuffixTree
             return "";
         }
         return seq.substring(0, seq.length() - 1);
-    }
-
-    public int computeCount()
-    {
-        return node(root).computeAndCacheCount();
     }
 
     /**
@@ -813,41 +781,228 @@ public class GSuffixTree
         }
     }
 
-    public static GSuffixTree construct(String path)
+    // /**
+    // * Indices of each node contains all
+    // *
+    // * @param path
+    // */
+    // private void toStringFile(String path)
+    // {
+    // try
+    // {
+    // long t1 = System.currentTimeMillis();
+    // System.out.print("Writing...");
+    // BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.gst"),
+    // "utf-8"));
+    // for (GSTEdge edge : edges)
+    // {
+    // eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
+    // }
+    // eWriter.close();
+    //
+    // BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.gst"),
+    // "utf-8"));
+    // for (int i = 0; i < nodes.size(); i++)
+    // {
+    // for (int idx : collectIndices(i))
+    // {
+    // nWriter.append(idx + "\t");
+    // }
+    // nWriter.append("\n");
+    //
+    // for (char ch : node(i).getEdges().keySet())
+    // {
+    // nWriter.append(ch + "\t").append(node(i).getEdges().get(ch) + "\t");
+    // }
+    // nWriter.append("\n");
+    // }
+    // nWriter.close();
+    // long t2 = System.currentTimeMillis();
+    // System.out.println("Done : " + (t2 - t1) + "ms");
+    // }
+    // catch (Exception ex)
+    // {
+    // ex.printStackTrace();
+    // }
+    // }
+
+    private static GSuffixTree loadDictFile(String file) throws IllegalStateException, IOException
     {
         long t1 = System.currentTimeMillis();
+        System.out.print("Loading words from " + file + " ...");
         GSuffixTree tree = new GSuffixTree();
-        System.out.print("Loading words from " + path + " ...");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+        int count = 0;
+        String line = null;
+        while ((line = reader.readLine()) != null)
+        {
+            tree.put(line, count++);
+            if (count % 10000 == 0)
+            {
+                System.out.print(".");
+            }
+        }
+        long t2 = System.currentTimeMillis();
+        System.out.println("Done : " + count + " : " + (t2 - t1) + "ms");
+        return tree;
+    }
+
+    /**
+     * Indices of each node contains all
+     * 
+     * @param path
+     * @throws IOException
+     */
+    private static void writetoBin(GSuffixTree tree, String path) throws IOException
+    {
+        long t1 = System.currentTimeMillis();
+        String edgeFile = path + ".edges.gst.bin";
+        String nodeFile = path + ".nodes.gst.bin";
+        System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
+        BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(edgeFile), "utf-8"));
+        eWriter.write(tree.edges.size());
+        for (GSTEdge edge : tree.edges)
+        {
+            eWriter.write(edge.getLabel().length());
+            eWriter.write(edge.getLabel().toCharArray());
+            eWriter.write(edge.getDest());
+        }
+        eWriter.close();
+
+        BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nodeFile), "utf-8"));
+        nWriter.write(tree.nodes.size());
+        for (int i = 0; i < tree.nodes.size(); i++)
+        {
+            Collection<Integer> allIndices = tree.collectIndices(i);
+            nWriter.write(allIndices.size());
+            for (int idx : allIndices)
+            {
+                nWriter.write(idx);
+            }
+            nWriter.write(tree.node(i).getEdges().size());
+            for (char ch : tree.node(i).getEdges().keySet())
+            {
+                nWriter.write(ch);
+                nWriter.write(tree.node(i).getEdges().get(ch));
+            }
+        }
+        nWriter.close();
+        long t2 = System.currentTimeMillis();
+        System.out.println("Done : " + (t2 - t1) + "ms");
+    }
+
+    public static void buildTree(String path)
+    {
         try
         {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(path), "utf-8"));
-            int index = 0;
-            String line = null;
-            while ((line = reader.readLine()) != null)
+            GSuffixTree tree = loadDictFile(path);
+
+            writetoBin(tree, path);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Returns all the indexes associated to this node and its children.
+     * 
+     * @return all the indexes associated to this node and its children
+     */
+    public Collection<Integer> collectIndices(int nodeIdx)
+    {
+        return collectIndices(nodeIdx, -1);
+    }
+
+    /**
+     * Returns the first <tt>numElements</tt> elements from the ones associated to this node.
+     * 
+     * Gets data from the payload of both this node and its children, the string representation of the path to this node
+     * is a substring of the one of the children nodes.
+     * 
+     * @param numElements the number of results to return. Use -1 to get all
+     * @return the first <tt>numElements</tt> associated to this node and children
+     */
+    Collection<Integer> collectIndices(int nodeIdx, int numElements)
+    {
+        Set<Integer> ret = new HashSet<Integer>();
+        for (int num : node(nodeIdx).getNodeIndices())
+        {
+            ret.add(num);
+            if (ret.size() == numElements)
             {
-                tree.put(line, index++);
-                if (index % 1000 == 0)
+                return ret;
+            }
+        }
+        // need to get more matches from child nodes. This is what may waste time
+        int missingItems = numElements == -1 ? -1 : numElements - ret.size();
+        for (int e : node(nodeIdx).getEdges().values())
+        {
+            if (-1 == numElements || ret.size() < numElements)
+            {
+                for (int num : node(edge(e).getDest()).getNodeIndices(missingItems))
                 {
-                    System.out.println(index);
+                    ret.add(num);
+                    if (ret.size() == numElements)
+                    {
+                        return ret;
+                    }
+                }
+                missingItems = numElements == -1 ? -1 : numElements - ret.size();
+            }
+        }
+        return ret;
+    }
+
+    /**
+     * Adds the given <tt>index</tt> to the set of indexes associated with <tt>nodeIdx</tt>
+     */
+    public void addIndex(int nodeIdx, int index)
+    {
+        if (node(nodeIdx).containsIndex(index))
+        {
+            return;
+        }
+
+        node(nodeIdx).addIdx(index);
+
+        // add this reference to all the suffixes as well
+        int iter = node(nodeIdx).suffix;
+        while (iter != -1)
+        {
+            if (node(iter).containsIndex(index))
+            {
+                break;
+            }
+            addIndex(iter, index);
+            iter = node(iter).suffix;
+        }
+    }
+
+    public void print()
+    {
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            if (node(i).getEdges().size() > 0)
+            {
+                System.out.println("@" + i + " -- ");
+
+                for (char ch : node(i).getEdges().keySet())
+                {
+                    GSTEdge edge = edge(node(i).getEdges().get(ch));
+                    System.out.print("  " + edge.getLabel() + "\t" + edge.getDest());
+                    if (node(edge.getDest()).getEdges().size() == 0)
+                    {
+                        System.out.println("#" + node(edge.getDest()).getNodeIndices().toString() + " #");
+                    }
+                    else
+                    {
+                        System.out.println("#" + node(edge.getDest()).getNodeIndices().toString());
+                    }
                 }
             }
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + index + " : " + (t2 - t1) + "ms");
-            return tree;
         }
-        catch (UnsupportedEncodingException e)
-        {
-            e.printStackTrace();
-        }
-        catch (FileNotFoundException e)
-        {
-            e.printStackTrace();
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static void main(String[] args)
@@ -861,18 +1016,16 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-//        GSuffixTree tree = construct("data/poi.txt");
-//
-//        tree.toBinaryFile("data/poi");
+        buildTree("data/poi.txt");
 
-        GSuffixTree tree2 = new GSuffixTree("data/poi", true);
+        GSuffixTree tree = new GSuffixTree("data/poi.txt", true);
 
-        System.out.println("Nodes : " + GSuffixTree.nodes.size());
+        System.out.println("Nodes : " + tree.nodes.size());
 
-        System.out.println("Edges : " + GSuffixTree.edges.size());
+        System.out.println("Edges : " + tree.edges.size());
 
-//        System.out.println(tree.search("门"));
-//        System.out.println(tree2.search("门"));
-//        System.out.println(tree2.computeCount());
+        // System.out.println(tree.search("门"));
+        // System.out.println(tree2.search("门"));
+        // System.out.println(tree2.computeCount());
     }
 }

@@ -15,7 +15,6 @@
  */
 package rsvp.answering.index.gst;
 
-
 /**
  * Represents an Edge in the Suffix Tree. It has a label and a destination Node
  */
@@ -26,9 +25,21 @@ class GSTEdge
 
     private int dest;
 
+    public GSTEdge(String label, int dest)
+    {
+        this.label = label;
+        this.dest = dest;
+    }
+
     public String getLabel()
     {
         return label;
+    }
+
+    @Override
+    public String toString()
+    {
+        return label + "\t" + dest;
     }
 
     public void setLabel(String label)
@@ -43,12 +54,6 @@ class GSTEdge
 
     public void setDest(int dest)
     {
-        this.dest = dest;
-    }
-
-    public GSTEdge(String label, int dest)
-    {
-        this.label = label;
         this.dest = dest;
     }
 

@@ -148,16 +148,12 @@ public class TrieTree
     private void addWord(String word)
     {
         int nodeIdx = root;
-        for (int j = 0; j < word.length(); j++)
+        for (int j = 0; j < word.length();)
         {
-            if (nodeIdx == -1)
-            {
-                nodeIdx = createNode();
-            }
             int edgeIdx = node(nodeIdx).getEdge(word.charAt(j));
             if (edgeIdx == -1) // create edge
             {
-                int newEdgeIdx = createEdge(word, -1);
+                int newEdgeIdx = createEdge(word.substring(j), -1);
                 node(nodeIdx).addEdge(word.charAt(j), newEdgeIdx);
                 return;
             }
@@ -191,6 +187,11 @@ public class TrieTree
                 }
 
                 nodeIdx = edge(edgeIdx).getDest(); // go to next node
+                if (nodeIdx == -1)
+                {
+                    nodeIdx = createNode();
+                    edge(edgeIdx).setDest(nodeIdx);
+                }
             }
         }
     }
@@ -229,6 +230,57 @@ public class TrieTree
 
         return midNode;
     }
+    
+    /**
+     * Take word as prefix, searches for the longest match.
+     * 
+     * @param word the key to search for
+     * @return matched word for the given word
+     */
+    public String match(String word)
+    {
+        StringBuffer result = new StringBuffer();
+        int currentNode = root;
+        int currentEdge = -1;
+
+        for (int i = 0; i < word.length();)
+        {
+            if(currentNode == -1)
+            {
+                return result.toString();
+            }
+            char ch = word.charAt(i);
+            currentEdge = node(currentNode).getEdge(ch);
+            if (-1 == currentEdge)
+            {
+                return result.toString();
+            }
+            else
+            {
+                String label = edge(currentEdge).getLabel();
+                for (int j = 0; j < label.length(); j++)
+                {
+                    if (i >= word.length())
+                    {
+                        return result.toString();
+                    }
+                    else if (word.charAt(i) == label.charAt(j))
+                    {
+                        result.append(label.charAt(j));
+                        i++;
+                    }
+                    else
+                    {
+                        return result.toString();
+                    }
+                }
+                currentNode = edge(currentEdge).getDest();
+            }
+        }
+
+        return result.toString();
+    }
+    
 
     public boolean containsWord(String argString)
     {
@@ -312,6 +364,22 @@ public class TrieTree
         return nodes.size() - 1;
     }
 
+    public void print()
+    {
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            if (node(i).getEdges().size() > 0)
+            {
+                System.out.println("@" + i + " -- ");
+
+                for (char ch : node(i).getEdges().keySet())
+                {
+                    TrieEdge edge = edge(node(i).getEdges().get(ch));
+                    System.out.println("  " + edge.getLabel() + "\t" + edge.getDest());
+                }
+            }
+        }
+    }
     // protected static int createNode(boolean isWord)
     // {
     // nodes.add(new TrieNode(isWord));
@@ -328,8 +396,9 @@ public class TrieTree
         // System.out.println(tree.containsPrefix("道口"));
         // System.out.println(tree.containsWord("五道口"));
         //
-        TrieTree tree = new TrieTree("data/poi.txt");
+        TrieTree tree = new TrieTree("data/poi2.txt");
 
+        tree.print();
         System.out.println("Nodes : " + TrieTree.nodes.size());
 
         System.out.println(tree.containsPrefix("杭州湾环线高速公路"));

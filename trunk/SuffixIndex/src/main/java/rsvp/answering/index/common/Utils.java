@@ -26,6 +26,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import rsvp.answering.index.gst.GSuffixTree;
+import rsvp.answering.index.trie.TrieTree;
 
 public class Utils
 {
@@ -174,11 +175,32 @@ public class Utils
         }
         return longestSubstr;
     }
+    
+    public static String findLongestSubstring(TrieTree tree, String word)
+    {
+        String longestSubstr = "";
+        for (int i = 0; i < word.length() - 1; i++)
+        {
+            String suffix = word.substring(i);
+            String matched = tree.match(suffix);
+            if (matched.length() > longestSubstr.length())
+            {
+                longestSubstr = matched;
+            }
+        }
+        return longestSubstr;
+    }
 
     public static void main(String[] args)
     {
-        GSuffixTree.buildTree("data/poi2.txt");
-
-        GSuffixTree tree = new GSuffixTree("data/poi2.txt");
+//        GSuffixTree.buildTree("data/poi2.txt");
+//
+//        GSuffixTree tree = new GSuffixTree("data/poi2.txt");
+//        
+//        System.out.println(findLongestSubstring(tree, "北京五道口城铁附近"));
+        
+        TrieTree tree2 = new TrieTree("data/poi.txt");
+        
+        System.out.println(findLongestSubstring(tree2, "北京五道口城铁附近"));
     }
 }

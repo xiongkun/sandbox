@@ -72,6 +72,28 @@ public class Utils
         return ret;
     }
 
+    public static Set<String> getPrefixes(String str)
+    {
+        Set<String> ret = new HashSet<String>();
+        for (int i = 1; i <= str.length(); ++i)
+        {
+            String itstr = str.substring(0, i);
+            ret.add(itstr);
+        }
+        return ret;
+    }
+    
+    public static Set<String> getSuffixes(String str)
+    {
+        Set<String> ret = new HashSet<String>();
+        for (int i = 0; i < str.length() - 1; ++i)
+        {
+            String itstr = str.substring(i);
+            ret.add(itstr);
+        }
+        return ret;
+    }
+
     public static HashMap<String, Integer> generateHashMap(String path)
     {
         HashMap<String, Integer> map = new HashMap<String, Integer>();
@@ -175,7 +197,7 @@ public class Utils
         }
         return longestSubstr;
     }
-    
+
     public static String findLongestSubstring(TrieTree tree, String word)
     {
         String longestSubstr = "";
@@ -193,14 +215,14 @@ public class Utils
 
     public static void main(String[] args)
     {
-//        GSuffixTree.buildTree("data/poi2.txt");
-//
-//        GSuffixTree tree = new GSuffixTree("data/poi2.txt");
-//        
-//        System.out.println(findLongestSubstring(tree, "北京五道口城铁附近"));
-        
+        // GSuffixTree.buildTree("data/poi2.txt");
+        //
+        // GSuffixTree tree = new GSuffixTree("data/poi2.txt");
+        //
+        // System.out.println(findLongestSubstring(tree, "北京五道口城铁附近"));
+
         TrieTree tree2 = new TrieTree("data/poi.txt");
-        
+
         System.out.println(findLongestSubstring(tree2, "北京五道口城铁附近"));
     }
 }

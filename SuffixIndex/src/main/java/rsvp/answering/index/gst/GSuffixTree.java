@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 
-import rsvp.answering.index.common.Utils;
-
 /**
  * A Generalized Suffix Tree, based on the Ukkonen's paper "On-line construction of suffix trees"
  * http://www.cs.helsinki.fi/u/ukkonen/SuffixT1withFigs.pdf
@@ -717,7 +715,7 @@ public class GSuffixTree
         String line = null;
         while ((line = reader.readLine()) != null)
         {
-            tree.addWord(line, count++);
+            tree.addWord(line.trim(), count++);
             if (count % 10000 == 0)
             {
                 System.out.print(".");
@@ -834,23 +832,6 @@ public class GSuffixTree
         
         return true;
     }
-
-    // private Collection<Integer> collectIndices(int nodeIdx)
-    // {
-    // Set<Integer> ret = new HashSet<Integer>();
-    // for (int num : node(nodeIdx).getNodeIndices())
-    // {
-    // ret.add(num);
-    // }
-    // for (int e : node(nodeIdx).getEdges().values())
-    // {
-    // for (int num : collectIndices(edge(e).getDest()))
-    // {
-    // ret.add(num);
-    // }
-    // }
-    // return ret;
-    // }
 
     /**
      * Adds the given <tt>index</tt> to the set of indexes associated with <tt>nodeIdx</tt>

@@ -276,7 +276,7 @@ public class GSuffixTree
      * @param index the value that will be added to the index
      * @throws IllegalStateException if an invalid index is passed as input
      */
-    protected void put(String key, int index) throws IllegalStateException
+    protected void addWord(String key, int index) throws IllegalStateException
     {
         if (index < last)
         {
@@ -717,7 +717,7 @@ public class GSuffixTree
         String line = null;
         while ((line = reader.readLine()) != null)
         {
-            tree.put(line, count++);
+            tree.addWord(line, count++);
             if (count % 10000 == 0)
             {
                 System.out.print(".");
@@ -738,10 +738,10 @@ public class GSuffixTree
     {
         // final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
         long t1 = System.currentTimeMillis();
-        tree.flush();
         String edgeFile = path + ".edges.gst.bin";
         String nodeFile = path + ".nodes.gst.bin";
         System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
+        tree.flush();
         BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(edgeFile), "utf-8"));
         eWriter.write(tree.edges.size());
         for (GSTEdge edge : tree.edges)
@@ -786,6 +786,53 @@ public class GSuffixTree
         {
             e.printStackTrace();
         }
+    }
+
+    public static void testTree(String path)
+    {
+        try
+        {
+            GSuffixTree tree = loadDictFile(path);
+
+            writetoBin(tree, path);
+
+            GSuffixTree tree2 = new GSuffixTree(path);
+
+            System.out.println("### " + compare(tree, tree2));
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
+
+    private static boolean compare(GSuffixTree tree, GSuffixTree tree2)
+    {
+        if (tree.nodes.size() != tree.nodes.size() || tree.edges.size() != tree.edges.size())
+        {
+            return false;
+        }
+            for (int i = 0; i < tree.nodes.size(); i++)
+            {
+                GSTNode node = tree.nodes.get(i);
+                GSTNode node2 = tree2.nodes.get(i);
+                if(!node.equals(node2))
+                {
+                    return false;
+                }
+            }
+            
+            for (int i = 0; i < tree.edges.size(); i++)
+            {
+                GSTEdge edge = tree.edges.get(i);
+                GSTEdge edge2 = tree2.edges.get(i);
+                if(!edge.equals(edge2))
+                {
+                    return false;
+                }
+            }
+        
+        return true;
     }
 
     // private Collection<Integer> collectIndices(int nodeIdx)
@@ -867,14 +914,14 @@ public class GSuffixTree
         // System.out.println(in.search("两"));
 
 //        GSuffixTree.buildTree("data/poi.txt");
-
-        GSuffixTree tree = new GSuffixTree("data/poi.txt");
-
-        System.out.println(Utils.findLongestSubstring(tree, "北京五道口城铁站附近"));
+//
+//        GSuffixTree tree = new GSuffixTree("data/poi.txt");
+//
+//        System.out.println(Utils.findLongestSubstring(tree, "北京五道口城铁站附近"));
         //
         // System.out.println("Nodes : " + tree.nodes.size());
         //
         // System.out.println("Edges : " + tree.edges.size());
-
+        testTree("data/poi.txt");
     }
 }

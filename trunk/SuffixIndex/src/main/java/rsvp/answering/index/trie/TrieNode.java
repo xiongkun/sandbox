@@ -17,9 +17,16 @@ public class TrieNode
 {
 
     private Map<Character, Integer> edges = new HashMap<Character, Integer>();
+    
+    private boolean isWord = false;
 
     public TrieNode()
     {
+    }
+    
+    public TrieNode(boolean isWord)
+    {
+        this.isWord = isWord;
     }
     
     public void addEdge(char ch, int argChild)
@@ -52,5 +59,20 @@ public class TrieNode
     public String toString()
     {
         return edges.toString();
+    }
+
+    public boolean isWord()
+    {
+        return isWord;
+    }
+
+    public void setIsWord(boolean isWord)
+    {
+        this.isWord = isWord;
+    }
+
+    public void removeEdge(char key)
+    {
+        this.edges.remove(key);
     }
 }

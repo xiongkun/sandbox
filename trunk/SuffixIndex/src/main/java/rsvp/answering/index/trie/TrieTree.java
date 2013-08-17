@@ -7,13 +7,10 @@
 package rsvp.answering.index.trie;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
@@ -36,44 +33,55 @@ public class TrieTree
         root = createNode();
     }
 
-    public TrieTree(String path, boolean fromFile)
+    public TrieTree(String[] words)
     {
-        try
+        root = createNode();
+        for (String word : words)
         {
-            System.out.print("Loading...");
-            long t1 = System.currentTimeMillis();
-
-            BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.trie"), "utf-8"));
-            String line = null;
-            while ((line = eReader.readLine()) != null)
-            {
-                String[] iss = line.split("[\t]");
-                edges.add(new TrieEdge(iss[0], Integer.parseInt(iss[1])));
-            }
-            eReader.close();
-
-            BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.trie"), "utf-8"));
-            line = null;
-            while ((line = nReader.readLine()) != null)
-            {
-                TrieNode node = new TrieNode();
-                String[] iss = line.split("[\t]");
-
-                for (int i = 0; i < iss.length - 1; i = i + 2)
-                {
-                    node.addEdge(iss[0].charAt(i), Integer.parseInt(iss[i + 1]));
-                }
-                nodes.add(node);
-            }
-            nReader.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
+            addWord(word.trim());
         }
     }
+
+    // public TrieTree(String path, boolean fromFile)
+    // {
+    // try
+    // {
+    // System.out.print("Loading...");
+    // long t1 = System.currentTimeMillis();
+    //
+    // BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.trie"),
+    // "utf-8"));
+    // String line = null;
+    // while ((line = eReader.readLine()) != null)
+    // {
+    // String[] iss = line.split("[\t]");
+    // edges.add(new TrieEdge(iss[0], Integer.parseInt(iss[1])));
+    // }
+    // eReader.close();
+    //
+    // BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.trie"),
+    // "utf-8"));
+    // line = null;
+    // while ((line = nReader.readLine()) != null)
+    // {
+    // TrieNode node = new TrieNode();
+    // String[] iss = line.split("[\t]");
+    //
+    // for (int i = 0; i < iss.length - 1; i = i + 2)
+    // {
+    // node.addEdge(iss[0].charAt(i), Integer.parseInt(iss[i + 1]));
+    // }
+    // nodes.add(node);
+    // }
+    // nReader.close();
+    // long t2 = System.currentTimeMillis();
+    // System.out.println("Done : " + (t2 - t1) + "ms");
+    // }
+    // catch (Exception ex)
+    // {
+    // ex.printStackTrace();
+    // }
+    // }
 
     public TrieTree(String path)
     {
@@ -87,7 +95,7 @@ public class TrieTree
             String line = null;
             while ((line = reader.readLine()) != null)
             {
-                addWord(line);
+                addWord(line.trim());
                 index++;
                 if (index % 100000 == 0)
                 {
@@ -112,40 +120,42 @@ public class TrieTree
         }
     }
 
-    public void toFile(String path)
-    {
-        try
-        {
-            long t1 = System.currentTimeMillis();
-            System.out.print("Writing...");
-            BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.trie"), "utf-8"));
-            for (TrieEdge edge : edges)
-            {
-                eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
-            }
-            eWriter.close();
+    // public void toFile(String path)
+    // {
+    // try
+    // {
+    // long t1 = System.currentTimeMillis();
+    // System.out.print("Writing...");
+    // BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".edges.trie"),
+    // "utf-8"));
+    // for (TrieEdge edge : edges)
+    // {
+    // eWriter.append(edge.getLabel()).append("\t" + edge.getDest() + "\n");
+    // }
+    // eWriter.close();
+    //
+    // BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.trie"),
+    // "utf-8"));
+    // for (TrieNode node : nodes)
+    // {
+    // // nWriter.append(node.isWord() + "\t");
+    // for (char ch : node.getEdges().keySet())
+    // {
+    // nWriter.append(Character.toString(ch)).append("\t").append(node.getEdges().get(ch) + "\t");
+    // }
+    // nWriter.append("\n");
+    // }
+    // nWriter.close();
+    // long t2 = System.currentTimeMillis();
+    // System.out.println("Done : " + (t2 - t1) + "ms");
+    // }
+    // catch (Exception ex)
+    // {
+    // ex.printStackTrace();
+    // }
+    // }
 
-            BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(path + ".nodes.trie"), "utf-8"));
-            for (TrieNode node : nodes)
-            {
-                // nWriter.append(node.isWord() + "\t");
-                for (char ch : node.getEdges().keySet())
-                {
-                    nWriter.append(Character.toString(ch)).append("\t").append(node.getEdges().get(ch) + "\t");
-                }
-                nWriter.append("\n");
-            }
-            nWriter.close();
-            long t2 = System.currentTimeMillis();
-            System.out.println("Done : " + (t2 - t1) + "ms");
-        }
-        catch (Exception ex)
-        {
-            ex.printStackTrace();
-        }
-    }
-
-    private void addWord(String word)
+    protected void addWord(String word)
     {
         int nodeIdx = root;
         for (int j = 0; j < word.length();)
@@ -165,6 +175,8 @@ public class TrieTree
                 {
                     if (j >= word.length()) // the end
                     {
+                        int midNode = split(nodeIdx, edgeIdx, i);
+                        node(midNode).setIsWord(true);
                         return;
                     }
                     else
@@ -177,7 +189,7 @@ public class TrieTree
                         // split edge
                         {
                             String lastWord = word.substring(j);
-                            int splitNode = split(nodeIdx, edgeIdx, i, lastWord);
+                            int splitNode = split(nodeIdx, edgeIdx, i);
                             // add new branch edge
                             int branchEdge = createEdge(lastWord, -1);
                             node(splitNode).addEdge(lastWord.charAt(0), branchEdge);
@@ -189,14 +201,14 @@ public class TrieTree
                 nodeIdx = edge(edgeIdx).getDest(); // go to next node
                 if (nodeIdx == -1)
                 {
-                    nodeIdx = createNode();
+                    nodeIdx = createNode(true);
                     edge(edgeIdx).setDest(nodeIdx);
                 }
             }
         }
     }
 
-    private int split(int nodeIdx, int edgeIdx, int posInLabe, String lastWord)
+    private int split(int nodeIdx, int edgeIdx, int posInLabe)
     {
         if (posInLabe == 0)
         {
@@ -213,7 +225,7 @@ public class TrieTree
         int midNode = createNode();
 
         int topCutEdge = createEdge(newLable, midNode);
-
+        
         node(nodeIdx).addEdge(newLable.charAt(0), topCutEdge);
 
         // set bottom cut edge
@@ -230,7 +242,7 @@ public class TrieTree
 
         return midNode;
     }
-    
+
     /**
      * Take word as prefix, searches for the longest match.
      * 
@@ -245,7 +257,7 @@ public class TrieTree
 
         for (int i = 0; i < word.length();)
         {
-            if(currentNode == -1)
+            if (currentNode == -1)
             {
                 return result.toString();
             }
@@ -280,12 +292,11 @@ public class TrieTree
 
         return result.toString();
     }
-    
 
     public boolean containsWord(String argString)
     {
         int node = getNode(argString);
-        return node == -1;
+        return node == -1 || (node > 0 && node(node).isWord());
     }
 
     public boolean containsPrefix(String argString)
@@ -364,6 +375,12 @@ public class TrieTree
         return nodes.size() - 1;
     }
 
+    protected static int createNode(boolean isWord)
+    {
+        nodes.add(new TrieNode(isWord));
+        return nodes.size() - 1;
+    }
+
     public void print()
     {
         for (int i = 0; i < nodes.size(); i++)
@@ -380,6 +397,7 @@ public class TrieTree
             }
         }
     }
+
     // protected static int createNode(boolean isWord)
     // {
     // nodes.add(new TrieNode(isWord));

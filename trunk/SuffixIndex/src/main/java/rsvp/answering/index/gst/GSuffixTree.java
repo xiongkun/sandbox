@@ -866,11 +866,11 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        GSuffixTree.buildTree("data/poi.txt");
+//        GSuffixTree.buildTree("data/poi.txt");
 
         GSuffixTree tree = new GSuffixTree("data/poi.txt");
 
-        System.out.println(Utils.findLongestSubstring(tree, "西直门城铁站附近"));
+        System.out.println(Utils.findLongestSubstring(tree, "北京五道口城铁站附近"));
         //
         // System.out.println("Nodes : " + tree.nodes.size());
         //

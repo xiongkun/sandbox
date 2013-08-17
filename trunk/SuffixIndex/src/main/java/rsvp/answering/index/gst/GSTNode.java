@@ -27,6 +27,79 @@ import java.util.HashSet;
 class GSTNode
 {
 
+    @Override
+    public int hashCode()
+    {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((edges == null) ? 0 : edges.hashCode());
+        result = prime * result + ((indices == null) ? 0 : indices.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        GSTNode other = (GSTNode) obj;
+        if (edges == null)
+        {
+            if (other.edges != null)
+                return false;
+        }
+        else if (!equals(edges, other.edges))
+        {
+            return false;
+        }
+        if (indices == null)
+        {
+            if (other.indices != null)
+                return false;
+        }
+        else if (!equals(indices, other.indices))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    private boolean equals(HashMap<Character, Integer> map1, HashMap<Character, Integer> map2)
+    {
+        if (map1.size() != map2.size())
+        {
+            return false;
+        }
+        for (char ch : map1.keySet())
+        {
+            if (!map2.containsKey(ch) || map1.get(ch) != map2.get(ch))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean equals(HashSet<Integer> set1, HashSet<Integer> set2)
+    {
+        if (set1.size() != set2.size())
+        {
+            return false;
+        }
+        for (int ch : set1)
+        {
+            if (!set2.contains(ch))
+            {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * The payload array used to store the data (indexes) associated with this node. In this case, it is used to store
      * all property indexes.
@@ -66,7 +139,7 @@ class GSTNode
         this.indices.clear();
         this.indices.addAll(all);
     }
-    
+
     public void addIndices(Collection<Integer> indices)
     {
         this.indices.addAll(indices);

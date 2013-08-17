@@ -29,7 +29,7 @@ public class SuffixTreeTest extends TestCase {
         GSuffixTree in = new GSuffixTree();
 
         String word = "cacao";
-        in.put(word, 0);
+        in.addWord(word, 0);
 
         /* test that every substring is contained within the tree */
         for (String s : getSubstrings(word)) {
@@ -41,7 +41,7 @@ public class SuffixTreeTest extends TestCase {
 
         in = new GSuffixTree();
         word = "bookkeeper";
-        in.put(word, 0);
+        in.addWord(word, 0);
         
         for (String s : getSubstrings(word)) {
             assertTrue(in.flushAndSearch(s).contains(0));
@@ -55,7 +55,7 @@ public class SuffixTreeTest extends TestCase {
         GSuffixTree in = new GSuffixTree();
 
         String word = "cacacato";
-        in.put(word, 0);
+        in.addWord(word, 0);
 
         /* test that every substring is contained within the tree */
         for (String s : getSubstrings(word)) {
@@ -67,8 +67,8 @@ public class SuffixTreeTest extends TestCase {
         // test whether the tree can handle repetitions
         GSuffixTree in = new GSuffixTree();
         String word = "cacao";
-        in.put(word, 0);
-        in.put(word, 1);
+        in.addWord(word, 0);
+        in.addWord(word, 1);
 
         for (String s : getSubstrings(word)) {
             assertTrue(in.flushAndSearch(s).contains(0));
@@ -80,7 +80,7 @@ public class SuffixTreeTest extends TestCase {
         GSuffixTree in = new GSuffixTree();
         String[] words = new String[] {"banana", "bano", "ba"};
         for (int i = 0; i < words.length; ++i) {
-            in.put(words[i], i);
+            in.addWord(words[i], i);
             
             for (String s : getSubstrings(words[i])) {
                 Collection<Integer> result = in.flushAndSearch(s);
@@ -99,7 +99,7 @@ public class SuffixTreeTest extends TestCase {
 
         // add again, to see if it's stable
         for (int i = 0; i < words.length; ++i) {
-            in.put(words[i], i + words.length);
+            in.addWord(words[i], i + words.length);
 
             for (String s : getSubstrings(words[i])) {
                 assertTrue(in.flushAndSearch(s).contains(i + words.length));
@@ -112,7 +112,7 @@ public class SuffixTreeTest extends TestCase {
         GSuffixTree in = new GSuffixTree();
         String[] words = new String[] {"cacaor" , "caricato", "cacato", "cacata", "caricata", "cacao", "banana"};
         for (int i = 0; i < words.length; ++i) {
-            in.put(words[i], i);
+            in.addWord(words[i], i);
 
             for (String s : getSubstrings(words[i])) {
                 Collection<Integer> result = in.flushAndSearch(s);
@@ -131,7 +131,7 @@ public class SuffixTreeTest extends TestCase {
 
         // add again, to see if it's stable
         for (int i = 0; i < words.length; ++i) {
-            in.put(words[i], i + words.length);
+            in.addWord(words[i], i + words.length);
 
             for (String s : getSubstrings(words[i])) {
                 assertTrue(in.flushAndSearch(s).contains(i + words.length));
@@ -175,7 +175,7 @@ public class SuffixTreeTest extends TestCase {
             "bethesdahomeforboys",
             "bethesda"};
         for (int i = 0; i < words.length; ++i) {
-            in.put(words[i], i);
+            in.addWord(words[i], i);
             
             for (String s : getSubstrings(words[i])) {
                 Collection<Integer> result = in.flushAndSearch(s);
@@ -194,7 +194,7 @@ public class SuffixTreeTest extends TestCase {
 
         // add again, to see if it's stable
         for (int i = 0; i < words.length; ++i) {
-            in.put(words[i], i + words.length);
+            in.addWord(words[i], i + words.length);
             
             for (String s : getSubstrings(words[i])) {
                 assertTrue(in.flushAndSearch(s).contains(i + words.length));

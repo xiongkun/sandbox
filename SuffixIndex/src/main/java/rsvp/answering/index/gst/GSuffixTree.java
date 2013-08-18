@@ -840,6 +840,7 @@ public class GSuffixTree
         }
         for (int i = 0; i < tree.nodes.size(); i++)
         {
+            System.err.println("n"+i);
             GSTNode node = tree.nodes.get(i);
             GSTNode node2 = tree2.nodes.get(i);
             if (!node.equals(node2))

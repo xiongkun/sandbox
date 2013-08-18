@@ -950,9 +950,9 @@ public class GSuffixTree
         // System.out.println(Utils.findLongestSubstring(tree, "北京五道口城铁站附近"));
         System.out.println("Compare : " + compare(tree, treeFromFile));
 
-        System.out.println("Nodes : " + treeFromFile.nodes.size());
+        System.out.println("Nodes : " + tree.nodes.size());
 
-        System.out.println("Edges : " + treeFromFile.edges.size());
+        System.out.println("Edges : " + tree.edges.size());
         // testTree("data/poi.txt");
     }
 }

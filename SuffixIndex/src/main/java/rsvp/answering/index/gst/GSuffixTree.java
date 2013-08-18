@@ -795,7 +795,7 @@ public class GSuffixTree
         {
             String word = line.trim();
             Collection<Integer> indices = search(word);
-            if (!indices.contains(index))
+            if (indices == null || !indices.contains(index))
             {
                 System.out.println("Not contains: " + word);
                  System.exit(-1);

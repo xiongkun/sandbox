@@ -746,7 +746,7 @@ public class GSuffixTree
         String edgeFile = path + ".edges.gst.bin";
         String nodeFile = path + ".nodes.gst.bin";
         System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
-        // tree.flush();
+        flush();
         BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(edgeFile), "utf-8"));
         eWriter.write(edges.size());
         for (GSTEdge edge : edges)

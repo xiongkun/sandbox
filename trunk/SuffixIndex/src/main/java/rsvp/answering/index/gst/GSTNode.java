@@ -185,7 +185,7 @@ class GSTNode
 
     int getEdge(char ch)
     {
-        Integer intg = edges.get(ch);
+        Integer intg = edges.get(Character.toString(ch));
         if (intg == null)
         {
             return -1;

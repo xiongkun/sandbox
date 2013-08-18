@@ -713,13 +713,13 @@ public class GSuffixTree
 //                nWriter.write(idx);
 //            }
             nWriter.write(node(i).getEdges().size());
-            for (char ch : node(i).getEdges().keySet())
+            for (String ch : node(i).getEdges().keySet())
             {
-                if('覃' == (ch))
+                if("覃".equals(ch))
                 {
                     System.err.println(node(i).getEdges().get(ch));
                 }
-                nWriter.write(ch);
+                nWriter.write(ch.charAt(0));
                 nWriter.write(node(i).getEdges().get(ch));
             }
         }
@@ -903,7 +903,7 @@ public class GSuffixTree
             {
                 System.out.println("@" + i + " -- ");
 
-                for (char ch : node(i).getEdges().keySet())
+                for (String ch : node(i).getEdges().keySet())
                 {
                     GSTEdge edge = edge(node(i).getEdges().get(ch));
                     System.out.print("  " + edge.getLabel() + "\t" + edge.getDest());

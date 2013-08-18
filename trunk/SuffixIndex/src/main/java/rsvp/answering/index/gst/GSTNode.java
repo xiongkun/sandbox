@@ -74,7 +74,7 @@ class GSTNode
         return true;
     }
 
-    private boolean equals(HashMap<Character, Integer> map1, HashMap<Character, Integer> map2)
+    private boolean equals(HashMap<String, Integer> map1, HashMap<String, Integer> map2)
     {
         if (map1.size() != map2.size())
         {
@@ -82,7 +82,7 @@ class GSTNode
             System.err.println("Target edge map size : " + map2.size());
             return false;
         }
-        for (char ch : map1.keySet())
+        for (String ch : map1.keySet())
         {
             if (!map2.containsKey(ch) || map2.get(ch).intValue() != map1.get(ch).intValue())
             {
@@ -131,7 +131,7 @@ class GSTNode
      * The set of edges starting from this node
      */
 
-    private HashMap<Character, Integer> edges;
+    private HashMap<String, Integer> edges;
 
     /**
      * The suffix link as described in Ukkonen's paper. if str is the string denoted by the path from the root to this,
@@ -144,7 +144,7 @@ class GSTNode
      */
     GSTNode()
     {
-        edges = new HashMap<Character, Integer>();
+        edges = new HashMap<String, Integer>();
         suffix = -1;
         indices = new HashSet<Integer>();
     }
@@ -180,7 +180,7 @@ class GSTNode
 
     void addEdge(char ch, int e)
     {
-        edges.put(ch, e);
+        edges.put(Character.toString(ch), e);
     }
 
     int getEdge(char ch)
@@ -193,7 +193,7 @@ class GSTNode
         return intg.intValue();
     }
 
-    HashMap<Character, Integer> getEdges()
+    HashMap<String, Integer> getEdges()
     {
         return edges;
     }

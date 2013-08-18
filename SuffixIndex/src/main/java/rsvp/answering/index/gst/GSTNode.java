@@ -28,6 +28,12 @@ class GSTNode
 {
 
     @Override
+    public String toString()
+    {
+        return indices + ", " + edges;
+    }
+
+    @Override
     public int hashCode()
     {
         final int prime = 31;
@@ -72,12 +78,16 @@ class GSTNode
     {
         if (map1.size() != map2.size())
         {
+            System.err.println("Expect : " + map1.size());
+            System.err.println("Target : " + map2.size());
             return false;
         }
         for (char ch : map1.keySet())
         {
-            if (!map2.containsKey(ch) || map1.get(ch) != map2.get(ch))
+            if (!map2.containsKey(ch) || map2.get(ch).intValue() != map1.get(ch).intValue())
             {
+                System.err.println("Expect : " + ch + "=" + map1.get(ch));
+                System.err.println("Target : " + ch + "=" + map2.get(ch));
                 return false;
             }
         }
@@ -88,12 +98,16 @@ class GSTNode
     {
         if (set1.size() != set2.size())
         {
+            System.err.println("Expect : " + set1.size());
+            System.err.println("Target : " + set2.size());
             return false;
         }
         for (int ch : set1)
         {
             if (!set2.contains(ch))
             {
+                System.err.println("Expect : " + set1.contains(ch));
+                System.err.println("Target : " + set2.contains(ch));
                 return false;
             }
         }

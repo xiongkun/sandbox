@@ -787,7 +787,7 @@ public class GSuffixTree
      */
     public void testCaseByCase(String file) throws IOException
     {
-        System.out.println("Testing...");
+        System.out.println("Testing ");
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
         int index = 0;
         String line = null;
@@ -797,20 +797,16 @@ public class GSuffixTree
             Collection<Integer> indices = search(word);
             if (indices == null || !indices.contains(index))
             {
-                System.out.println("Not contains: " + word);
-                 System.exit(-1);
+                System.err.println("Not contains: " + word + "@" + index);
+                System.exit(-1);
             }
 
             if (!word.equals(match(word)))
             {
-                System.out.println("Not matched:  " + word);
-                 System.exit(-1);
+                System.err.println("Not matched:  " + word + "@" + index);
+                System.exit(-1);
             }
             index++;
-            if (index % 10000 == 0)
-            {
-                System.out.print(".");
-            }
         }
     }
 

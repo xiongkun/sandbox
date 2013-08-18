@@ -711,18 +711,25 @@ public class GSuffixTree
         System.out.print("Loading words from " + file + " ...");
         GSuffixTree tree = new GSuffixTree();
         BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
-        int count = 0;
+        int index = 0;
         String line = null;
         while ((line = reader.readLine()) != null)
         {
-            tree.addWord(line.trim(), count++);
-            if (count % 10000 == 0)
+            String word = line.trim();
+            tree.addWord(word, index++);
+            Collection<Integer> indices = tree.search(word);
+            if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
+            {
+                System.out.println("1: " + word);
+                System.exit(-1);
+            }
+            if (index % 10000 == 0)
             {
                 System.out.print(".");
             }
         }
         long t2 = System.currentTimeMillis();
-        System.out.println("Done : " + count + " : " + (t2 - t1) + "ms");
+        System.out.println("Done : " + index + " : " + (t2 - t1) + "ms");
         return tree;
     }
 
@@ -732,17 +739,17 @@ public class GSuffixTree
      * @param path
      * @throws IOException
      */
-    private static void writetoBin(GSuffixTree tree, String path) throws IOException
+    public void toBinaryFile(String path) throws IOException
     {
         // final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
         long t1 = System.currentTimeMillis();
         String edgeFile = path + ".edges.gst.bin";
         String nodeFile = path + ".nodes.gst.bin";
         System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
-        tree.flush();
+        // tree.flush();
         BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(edgeFile), "utf-8"));
-        eWriter.write(tree.edges.size());
-        for (GSTEdge edge : tree.edges)
+        eWriter.write(edges.size());
+        for (GSTEdge edge : edges)
         {
             eWriter.write(edge.getLabel().length());
             eWriter.write(edge.getLabel().toCharArray());
@@ -751,20 +758,20 @@ public class GSuffixTree
         eWriter.close();
 
         BufferedWriter nWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(nodeFile), "utf-8"));
-        nWriter.write(tree.nodes.size());
-        for (int i = 0; i < tree.nodes.size(); i++)
+        nWriter.write(nodes.size());
+        for (int i = 0; i < nodes.size(); i++)
         {
-            HashSet<Integer> indices = tree.node(i).getNodeIndices();
+            HashSet<Integer> indices = node(i).getNodeIndices();
             nWriter.write(indices.size());
             for (int idx : indices)
             {
                 nWriter.write(idx);
             }
-            nWriter.write(tree.node(i).getEdges().size());
-            for (char ch : tree.node(i).getEdges().keySet())
+            nWriter.write(node(i).getEdges().size());
+            for (char ch : node(i).getEdges().keySet())
             {
                 nWriter.write(ch);
-                nWriter.write(tree.node(i).getEdges().get(ch));
+                nWriter.write(node(i).getEdges().get(ch));
             }
         }
         nWriter.close();
@@ -772,64 +779,85 @@ public class GSuffixTree
         System.out.println("Done : " + (t2 - t1) + "ms");
     }
 
-    public static void buildTree(String path)
+    /**
+     * Load gst from bin files which is flushed
+     * 
+     * @param path
+     * @throws IOException
+     */
+    public void testCaseByCase(String file) throws IOException
     {
-        try
+        System.out.println("Testing...");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file), "utf-8"));
+        int index = 0;
+        String line = null;
+        while ((line = reader.readLine()) != null)
         {
-            GSuffixTree tree = loadDictFile(path);
+            String word = line.trim();
+            Collection<Integer> indices = search(word);
+            if (!indices.contains(index))
+            {
+                System.out.println("Not contains: " + word);
+                 System.exit(-1);
+            }
 
-            writetoBin(tree, path);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
+            if (!word.equals(match(word)))
+            {
+                System.out.println("Not matched:  " + word);
+                 System.exit(-1);
+            }
+            index++;
+            if (index % 10000 == 0)
+            {
+                System.out.print(".");
+            }
         }
     }
 
-    public static void testTree(String path)
+    public static GSuffixTree buildTree(String path)
     {
+        GSuffixTree tree = null;
         try
         {
-            GSuffixTree tree = loadDictFile(path);
-
-            writetoBin(tree, path);
-
-            GSuffixTree tree2 = new GSuffixTree(path);
-
-            System.out.println("### " + compare(tree, tree2));
+            tree = loadDictFile(path);
         }
-        catch (Exception e)
+        catch (IllegalStateException e)
         {
             e.printStackTrace();
         }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+        return tree;
     }
 
-    private static boolean compare(GSuffixTree tree, GSuffixTree tree2)
+    public static boolean compare(GSuffixTree tree, GSuffixTree tree2)
     {
         if (tree.nodes.size() != tree.nodes.size() || tree.edges.size() != tree.edges.size())
         {
             return false;
         }
-            for (int i = 0; i < tree.nodes.size(); i++)
+        for (int i = 0; i < tree.nodes.size(); i++)
+        {
+            GSTNode node = tree.nodes.get(i);
+            GSTNode node2 = tree2.nodes.get(i);
+            if (!node.equals(node2))
             {
-                GSTNode node = tree.nodes.get(i);
-                GSTNode node2 = tree2.nodes.get(i);
-                if(!node.equals(node2))
-                {
-                    return false;
-                }
+                return false;
             }
-            
-            for (int i = 0; i < tree.edges.size(); i++)
+        }
+
+        for (int i = 0; i < tree.edges.size(); i++)
+        {
+            GSTEdge edge = tree.edges.get(i);
+            GSTEdge edge2 = tree2.edges.get(i);
+            if (!edge.equals(edge2))
             {
-                GSTEdge edge = tree.edges.get(i);
-                GSTEdge edge2 = tree2.edges.get(i);
-                if(!edge.equals(edge2))
-                {
-                    return false;
-                }
+                return false;
             }
-        
+        }
+
         return true;
     }
 
@@ -894,15 +922,27 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-//        GSuffixTree.buildTree("data/poi.txt");
-//
-//        GSuffixTree tree = new GSuffixTree("data/poi.txt");
-//
-//        System.out.println(Utils.findLongestSubstring(tree, "北京五道口城铁站附近"));
-        //
-        // System.out.println("Nodes : " + tree.nodes.size());
-        //
-        // System.out.println("Edges : " + tree.edges.size());
-        testTree("data/poi.txt");
+        String path = "data/poi.txt";
+        GSuffixTree tree = GSuffixTree.buildTree(path);
+        GSuffixTree treeFromFile = null;
+        try
+        {
+            tree.testCaseByCase(path);
+            tree.toBinaryFile(path);
+            treeFromFile = new GSuffixTree(path);
+            treeFromFile.testCaseByCase(path);
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+        // System.out.println(Utils.findLongestSubstring(tree, "北京五道口城铁站附近"));
+        System.out.println("Compare : " + compare(tree, treeFromFile));
+
+        System.out.println("Nodes : " + treeFromFile.nodes.size());
+
+        System.out.println("Edges : " + treeFromFile.edges.size());
+        // testTree("data/poi.txt");
     }
 }

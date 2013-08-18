@@ -706,12 +706,12 @@ public class GSuffixTree
         nWriter.write(nodes.size());
         for (int i = 0; i < nodes.size(); i++)
         {
-            HashSet<Integer> indices = node(i).getNodeIndices();
-            nWriter.write(indices.size());
-            for (int idx : indices)
-            {
-                nWriter.write(idx);
-            }
+//            HashSet<Integer> indices = node(i).getNodeIndices();
+//            nWriter.write(indices.size());
+//            for (int idx : indices)
+//            {
+//                nWriter.write(idx);
+//            }
             nWriter.write(node(i).getEdges().size());
             StringBuffer sb = new StringBuffer();
             for (char ch : node(i).getEdges().keySet())
@@ -768,11 +768,11 @@ public class GSuffixTree
             for (int i = 0; i < nodeNum; i++)
             {
                 GSTNode node = new GSTNode();
-                int dataNum = nReader.read();
-                for (int j = 0; j < dataNum; j++)
-                {
-                    node.addIndex(nReader.read());
-                }
+//                int dataNum = nReader.read();
+//                for (int j = 0; j < dataNum; j++)
+//                {
+//                    node.addIndex(nReader.read());
+//                }
                 int edgeMapNum = nReader.read();
                 
                 char[] startChaArray = new char[edgeMapNum];

@@ -662,12 +662,12 @@ public class GSuffixTree
         {
             String word = line.trim();
             tree.addWord(word, index++);
-//            Collection<Integer> indices = tree.search(word);
-//            if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
-//            {
-//                System.out.println("1: " + word);
-//                System.exit(-1);
-//            }
+            // Collection<Integer> indices = tree.search(word);
+            // if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
+            // {
+            // System.out.println("1: " + word);
+            // System.exit(-1);
+            // }
             if (index % 10000 == 0)
             {
                 System.out.print(".");
@@ -712,15 +712,27 @@ public class GSuffixTree
             {
                 nWriter.write(idx);
             }
-            if(i==0)
+            if (i == 0)
             {
-                System.out.println("writer node[0] edge sizes "+node(i).getEdges().size());
+                System.out.println("writer node[0] edge sizes " + node(i).getEdges().size());
             }
             nWriter.write(node(i).getEdges().size());
+            StringBuffer sb = new StringBuffer();
             for (char ch : node(i).getEdges().keySet())
             {
-                nWriter.write(ch);
-                nWriter.write(node(i).getEdges().get(ch));
+                sb.append(ch);
+            }
+            String sbStr = sb.toString();
+            nWriter.write(sbStr);
+
+            for (int j = 0; j < sbStr.length(); j++)
+            {
+                // nWriter.write(ch);
+                if(!node(i).getEdges().containsKey(sbStr.charAt(j)))
+                {
+                    System.err.println("Error");
+                }
+                nWriter.write(node(i).getEdges().get(sbStr.charAt(j)));
             }
         }
         nWriter.close();
@@ -739,7 +751,7 @@ public class GSuffixTree
         {
             System.out.print("Loading...");
             long t1 = System.currentTimeMillis();
-    
+
             BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst.bin"), "utf-8"));
             int edgeNum = eReader.read();
             this.edges = new ArrayList<GSTEdge>(edgeNum);
@@ -752,11 +764,9 @@ public class GSuffixTree
                 edges.add(new GSTEdge(new String(lableChar), dest));
             }
             eReader.close();
-            
-            
-    
+
             BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst.bin"), "utf-8"));
-    
+
             int nodeNum = nReader.read();
             this.nodes = new ArrayList<GSTNode>(nodeNum);
             for (int i = 0; i < nodeNum; i++)
@@ -768,14 +778,17 @@ public class GSuffixTree
                     node.addIndex(nReader.read());
                 }
                 int edgeMapNum = nReader.read();
+                
+                char[] startChaArray = new char[edgeMapNum];
+                nReader.read(startChaArray);
                 for (int j = 0; j < edgeMapNum; j++)
                 {
-                    char ch = (char) nReader.read();
-                    node.addEdge(ch, nReader.read());
+//                    char ch = (char) nReader.read();
+                    node.addEdge(startChaArray[j], nReader.read());
                 }
                 nodes.add(node);
             }
-    
+
             nReader.close();
             long t2 = System.currentTimeMillis();
             System.out.println("Done : " + (t2 - t1) + "ms");
@@ -844,13 +857,13 @@ public class GSuffixTree
         }
         for (int i = 0; i < tree.nodes.size(); i++)
         {
-            System.err.println("n"+i);
+            System.err.println("n" + i);
             GSTNode node = tree.nodes.get(i);
             GSTNode node2 = tree2.nodes.get(i);
             if (!node.equals(node2))
             {
-//                System.err.println("Expect : "+node.toString());
-//                System.err.println("Target : "+node2.toString());
+                // System.err.println("Expect : "+node.toString());
+                // System.err.println("Target : "+node2.toString());
                 return false;
             }
         }
@@ -861,8 +874,8 @@ public class GSuffixTree
             GSTEdge edge2 = tree2.edges.get(i);
             if (!edge.equals(edge2))
             {
-//                System.err.println("Expect : "+edge.toString());
-//                System.err.println("Target : "+edge2.toString());
+                // System.err.println("Expect : "+edge.toString());
+                // System.err.println("Target : "+edge2.toString());
                 return false;
             }
         }
@@ -919,7 +932,7 @@ public class GSuffixTree
             }
         }
     }
-    
+
     public static void main(String[] args)
     {
         // GSuffixTree in = new GSuffixTree();
@@ -936,11 +949,11 @@ public class GSuffixTree
         GSuffixTree treeFromFile = null;
         try
         {
-//            tree.testCaseByCase(path);
+            // tree.testCaseByCase(path);
             tree.flush();
             tree.writeToBinaryFile(path);
             treeFromFile = new GSuffixTree(path);
-//            treeFromFile.testCaseByCase(path);
+            // treeFromFile.testCaseByCase(path);
         }
         catch (IOException e)
         {

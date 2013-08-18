@@ -922,7 +922,7 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        String path = "data/poi2.txt";
+        String path = "data/poi.txt";
         GSuffixTree tree = GSuffixTree.buildTree(path);
         GSuffixTree treeFromFile = null;
         try

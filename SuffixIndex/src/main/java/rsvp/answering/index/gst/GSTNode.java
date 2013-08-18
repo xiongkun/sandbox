@@ -78,8 +78,8 @@ class GSTNode
     {
         if (map1.size() != map2.size())
         {
-            System.err.println("Expect : " + map1.size());
-            System.err.println("Target : " + map2.size());
+            System.err.println("Expect edge map size : " + map1.size());
+            System.err.println("Target edge map size : " + map2.size());
             return false;
         }
         for (char ch : map1.keySet())
@@ -98,8 +98,9 @@ class GSTNode
     {
         if (set1.size() != set2.size())
         {
-            System.err.println("Expect : " + set1.size());
-            System.err.println("Target : " + set2.size());
+            
+            System.err.println("Expect indices size : " + set1.size());
+            System.err.println("Target indices size : " + set2.size());
             return false;
         }
         for (int ch : set1)

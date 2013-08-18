@@ -852,17 +852,17 @@ public class GSuffixTree
             return false;
         }
         
-        for (int i = 0; i < tree.edges.size(); i++)
-        {
-            GSTEdge edge = tree.edges.get(i);
-            GSTEdge edge2 = tree2.edges.get(i);
-            if (!edge.equals(edge2))
-            {
-                // System.err.println("Expect : "+edge.toString());
-                // System.err.println("Target : "+edge2.toString());
-                return false;
-            }
-        }
+//        for (int i = 0; i < tree.edges.size(); i++)
+//        {
+//            GSTEdge edge = tree.edges.get(i);
+//            GSTEdge edge2 = tree2.edges.get(i);
+//            if (!edge.equals(edge2))
+//            {
+//                // System.err.println("Expect : "+edge.toString());
+//                // System.err.println("Target : "+edge2.toString());
+//                return false;
+//            }
+//        }
         
         for (int i = 0; i < tree.nodes.size(); i++)
         {

@@ -96,22 +96,22 @@ class GSTNode
 
     private boolean equals(HashSet<Integer> set1, HashSet<Integer> set2)
     {
-        if (set1.size() != set2.size())
-        {
-            
-            System.err.println("Expect indices size : " + set1.size());
-            System.err.println("Target indices size : " + set2.size());
-            return false;
-        }
-        for (int ch : set1)
-        {
-            if (!set2.contains(ch))
-            {
-                System.err.println("Expect : " + set1.contains(ch));
-                System.err.println("Target : " + set2.contains(ch));
-                return false;
-            }
-        }
+//        if (set1.size() != set2.size())
+//        {
+//            
+//            System.err.println("Expect indices size : " + set1.size());
+//            System.err.println("Target indices size : " + set2.size());
+//            return false;
+//        }
+//        for (int ch : set1)
+//        {
+//            if (!set2.contains(ch))
+//            {
+//                System.err.println("Expect : " + set1.contains(ch));
+//                System.err.println("Target : " + set2.contains(ch));
+//                return false;
+//            }
+//        }
         return true;
     }
 

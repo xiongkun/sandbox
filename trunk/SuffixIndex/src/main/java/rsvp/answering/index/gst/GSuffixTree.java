@@ -840,6 +840,8 @@ public class GSuffixTree
             GSTNode node2 = tree2.nodes.get(i);
             if (!node.equals(node2))
             {
+                System.err.println("Expect : "+node.toString());
+                System.err.println("Target : "+node2.toString());
                 return false;
             }
         }
@@ -850,6 +852,8 @@ public class GSuffixTree
             GSTEdge edge2 = tree2.edges.get(i);
             if (!edge.equals(edge2))
             {
+                System.err.println("Expect : "+edge.toString());
+                System.err.println("Target : "+edge2.toString());
                 return false;
             }
         }
@@ -918,7 +922,7 @@ public class GSuffixTree
         // System.out.println(in.search("飞流"));
         // System.out.println(in.search("两"));
 
-        String path = "data/poi.txt";
+        String path = "data/poi2.txt";
         GSuffixTree tree = GSuffixTree.buildTree(path);
         GSuffixTree treeFromFile = null;
         try

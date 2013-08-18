@@ -275,7 +275,7 @@ public class SuffixTreeTest extends TestCase
         String file = "data/test";
         try
         {
-            in.toBinaryFile(file);
+            in.writeToBinaryFile(file);
         }
         catch (IOException e)
         {

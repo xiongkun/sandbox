@@ -743,14 +743,13 @@ public class GSuffixTree
      * @param path
      * @throws IOException
      */
-    public void toBinaryFile(String path) throws IOException
+    public void writeToBinaryFile(String path) throws IOException
     {
         // final HashSet<Integer> indices = new HashSet<Integer>(0);// empty indices
         long t1 = System.currentTimeMillis();
         String edgeFile = path + ".edges.gst.bin";
         String nodeFile = path + ".nodes.gst.bin";
         System.out.print("Writing to " + edgeFile + " and " + nodeFile + " ...");
-        flush();
         BufferedWriter eWriter = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(edgeFile), "utf-8"));
         eWriter.write(edges.size());
         for (GSTEdge edge : edges)
@@ -933,7 +932,8 @@ public class GSuffixTree
         try
         {
 //            tree.testCaseByCase(path);
-            tree.toBinaryFile(path);
+            tree.flush();
+            tree.writeToBinaryFile(path);
             treeFromFile = new GSuffixTree(path);
 //            treeFromFile.testCaseByCase(path);
         }

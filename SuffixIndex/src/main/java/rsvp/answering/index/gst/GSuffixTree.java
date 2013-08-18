@@ -65,7 +65,6 @@ import java.util.HashSet;
  */
 public class GSuffixTree
 {
-
     public ArrayList<GSTNode> nodes = new ArrayList<GSTNode>();
 
     public ArrayList<GSTEdge> edges = new ArrayList<GSTEdge>();
@@ -665,6 +664,7 @@ public class GSuffixTree
 
             BufferedReader eReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".edges.gst.bin"), "utf-8"));
             int edgeNum = eReader.read();
+            this.edges = new ArrayList<GSTEdge>(edgeNum);
             for (int i = 0; i < edgeNum; i++)
             {
                 int lableCharNum = eReader.read();
@@ -674,10 +674,13 @@ public class GSuffixTree
                 edges.add(new GSTEdge(new String(lableChar), dest));
             }
             eReader.close();
+            
+            
 
             BufferedReader nReader = new BufferedReader(new InputStreamReader(new FileInputStream(path + ".nodes.gst.bin"), "utf-8"));
 
             int nodeNum = nReader.read();
+            this.nodes = new ArrayList<GSTNode>(nodeNum);
             for (int i = 0; i < nodeNum; i++)
             {
                 GSTNode node = new GSTNode();
@@ -717,17 +720,18 @@ public class GSuffixTree
         {
             String word = line.trim();
             tree.addWord(word, index++);
-            Collection<Integer> indices = tree.search(word);
-            if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
-            {
-                System.out.println("1: " + word);
-                System.exit(-1);
-            }
+//            Collection<Integer> indices = tree.search(word);
+//            if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
+//            {
+//                System.out.println("1: " + word);
+//                System.exit(-1);
+//            }
             if (index % 10000 == 0)
             {
                 System.out.print(".");
             }
         }
+        reader.close();
         long t2 = System.currentTimeMillis();
         System.out.println("Done : " + index + " : " + (t2 - t1) + "ms");
         return tree;
@@ -808,6 +812,7 @@ public class GSuffixTree
             }
             index++;
         }
+        reader.close();
     }
 
     public static GSuffixTree buildTree(String path)
@@ -910,7 +915,7 @@ public class GSuffixTree
             }
         }
     }
-
+    
     public static void main(String[] args)
     {
         // GSuffixTree in = new GSuffixTree();
@@ -927,10 +932,10 @@ public class GSuffixTree
         GSuffixTree treeFromFile = null;
         try
         {
-            tree.testCaseByCase(path);
+//            tree.testCaseByCase(path);
             tree.toBinaryFile(path);
             treeFromFile = new GSuffixTree(path);
-            treeFromFile.testCaseByCase(path);
+//            treeFromFile.testCaseByCase(path);
         }
         catch (IOException e)
         {

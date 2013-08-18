@@ -713,22 +713,10 @@ public class GSuffixTree
 //                nWriter.write(idx);
 //            }
             nWriter.write(node(i).getEdges().size());
-            StringBuffer sb = new StringBuffer();
             for (char ch : node(i).getEdges().keySet())
             {
-                sb.append(ch);
-            }
-            String sbStr = sb.toString();
-            nWriter.write(sbStr);
-
-            for (int j = 0; j < sbStr.length(); j++)
-            {
-                // nWriter.write(ch);
-                if(!node(i).getEdges().containsKey(sbStr.charAt(j)))
-                {
-                    System.err.println("Error");
-                }
-                nWriter.write(node(i).getEdges().get(sbStr.charAt(j)));
+                nWriter.write(ch);
+                nWriter.write(node(i).getEdges().get(ch));
             }
         }
         nWriter.close();
@@ -774,13 +762,10 @@ public class GSuffixTree
 //                    node.addIndex(nReader.read());
 //                }
                 int edgeMapNum = nReader.read();
-                
-                char[] startChaArray = new char[edgeMapNum];
-                nReader.read(startChaArray);
                 for (int j = 0; j < edgeMapNum; j++)
                 {
-//                    char ch = (char) nReader.read();
-                    node.addEdge(startChaArray[j], nReader.read());
+                    char ch = (char) nReader.read();
+                    node.addEdge(ch, nReader.read());
                 }
                 nodes.add(node);
             }

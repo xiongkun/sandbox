@@ -715,6 +715,10 @@ public class GSuffixTree
             nWriter.write(node(i).getEdges().size());
             for (char ch : node(i).getEdges().keySet())
             {
+                if('覃' == (ch))
+                {
+                    System.err.println(node(i).getEdges().get(ch));
+                }
                 nWriter.write(ch);
                 nWriter.write(node(i).getEdges().get(ch));
             }

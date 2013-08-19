@@ -666,12 +666,12 @@ public class GSuffixTree
         {
             String word = line.trim();
             tree.addWord(word, index++);
-            // Collection<Integer> indices = tree.search(word);
-            // if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
-            // {
-            // System.out.println("1: " + word);
-            // System.exit(-1);
-            // }
+             Collection<Integer> indices = tree.search(word);
+             if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
+             {
+             System.out.println("1: " + word);
+             System.exit(-1);
+             }
             if (index % 10000 == 0)
             {
                 System.out.print(".");
@@ -957,11 +957,11 @@ public class GSuffixTree
         GSuffixTree treeFromFile = null;
         try
         {
-             tree.testCaseByCase(path);
+            tree.testCaseByCase(path);
             tree.flush();
             tree.writeToBinaryFile(path);
             treeFromFile = new GSuffixTree(path);
-             treeFromFile.testCaseByCase(path);
+            treeFromFile.testCaseByCase(path);
         }
         catch (IOException e)
         {

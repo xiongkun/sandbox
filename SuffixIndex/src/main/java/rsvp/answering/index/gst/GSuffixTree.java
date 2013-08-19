@@ -101,7 +101,7 @@ public class GSuffixTree
      */
     public GSuffixTree(String path)
     {
-        constructFromBin(path);
+        readFromBinaryFile(path);
     }
 
     /**
@@ -666,12 +666,6 @@ public class GSuffixTree
         {
             String word = line.trim();
             tree.addWord(word, index++);
-             Collection<Integer> indices = tree.search(word);
-             if (!indices.contains(index - 1) || !word.equals(tree.match(word)))
-             {
-             System.out.println("1: " + word);
-             System.exit(-1);
-             }
             if (index % 10000 == 0)
             {
                 System.out.print(".");
@@ -710,12 +704,12 @@ public class GSuffixTree
         writeInt(nWriter, nodes.size());
         for (int i = 0; i < nodes.size(); i++)
         {
-            HashSet<Integer> indices = node(i).getNodeIndices();
-            writeInt(nWriter, indices.size());
-            for (int idx : indices)
-            {
-                writeInt(nWriter, idx);
-            }
+//            HashSet<Integer> indices = node(i).getNodeIndices();
+//            writeInt(nWriter, indices.size());
+//            for (int idx : indices)
+//            {
+//                writeInt(nWriter, idx);
+//            }
             writeInt(nWriter, node(i).getEdges().size());
             for (String ch : node(i).getEdges().keySet())
             {
@@ -733,7 +727,7 @@ public class GSuffixTree
      * 
      * @param path
      */
-    private void constructFromBin(String path)
+    private void readFromBinaryFile(String path)
     {
         try
         {
@@ -760,12 +754,12 @@ public class GSuffixTree
             for (int i = 0; i < nodeNum; i++)
             {
                 GSTNode node = new GSTNode();
-                int indexNum = readInt(nReader);
-                for (int j = 0; j < indexNum; j++)
-                {
-                    int index = readInt(nReader);
-                    node.addIndex(index);
-                }
+//                int indexNum = readInt(nReader);
+//                for (int j = 0; j < indexNum; j++)
+//                {
+//                    int index = readInt(nReader);
+//                    node.addIndex(index);
+//                }
                 int edgeMapNum = readInt(nReader);
                 for (int j = 0; j < edgeMapNum; j++)
                 {
@@ -957,19 +951,19 @@ public class GSuffixTree
         GSuffixTree treeFromFile = null;
         try
         {
-            tree.testCaseByCase(path);
+//            tree.testCaseByCase(path);
             tree.flush();
             tree.writeToBinaryFile(path);
             treeFromFile = new GSuffixTree(path);
-            treeFromFile.testCaseByCase(path);
+//            treeFromFile.testCaseByCase(path);
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
 
-        // System.out.println(Utils.findLongestSubstring(tree, "北京五道口城铁站附近"));
-        System.out.println("Compare : " + compare(tree, treeFromFile));
+         System.out.println(Utils.findLongestSubstring(treeFromFile, "北京五道口城铁站附近"));
+//        System.out.println("Compare : " + compare(tree, treeFromFile));
 
         System.out.println("Nodes : " + tree.nodes.size());
 

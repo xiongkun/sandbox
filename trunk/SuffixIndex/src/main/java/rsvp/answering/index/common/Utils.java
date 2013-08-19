@@ -82,7 +82,7 @@ public class Utils
         }
         return ret;
     }
-    
+
     public static Set<String> getSuffixes(String str)
     {
         Set<String> ret = new HashSet<String>();
@@ -211,6 +211,22 @@ public class Utils
             }
         }
         return longestSubstr;
+    }
+
+    public static byte[] toBytes(int intg)
+    {
+        byte[] ret = new byte[4];
+        ret[0] = (byte) ((intg >> 24) & 0xff);
+        ret[1] = (byte) ((intg >> 16) & 0xff);
+        ret[2] = (byte) ((intg >> 8) & 0xff);
+        ret[3] = (byte) (intg & 0xff);
+
+        return ret;
+    }
+
+    public static int toInteger(byte[] bytes)
+    {
+        return ((bytes[0] & 0xff) << 24) | ((bytes[1] & 0xff) << 16) | ((bytes[2] & 0xff) << 8) | (bytes[3] & 0xff);
     }
 
     public static void main(String[] args)
